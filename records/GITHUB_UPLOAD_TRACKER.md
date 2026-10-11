@@ -19,7 +19,8 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **7** | `b421f29` | 2026-10-11 20:05:00 | `run.py`, `run.sh`, `run.bat`, `frontend/assets/css/main.css`, `frontend/assets/js/pages/dashboard.js`, `jobs.js`, `results.js`, `system.js`, `targets.js`, `tests/run_tests.py`, test suite fixes, `records/` | Phase 4: Universal one-command launchers (run.py/run.sh/run.bat), vibrant colorful cyberpunk UI overhaul, 24/24 unit test suite | **SUCCESS (Pushed)** |
 | **8** | `50eac5f` | 2026-10-11 20:15:00 | `run.sh`, `run.py`, `README.md`, `docs/AWS_EC2_DEPLOYMENT.md`, `records/` | Phase 5: Direct HTTP access over EC2 Public IP on custom/default port (no domain/HTTPS needed) | **SUCCESS (Pushed)** |
 | **9** | `fc420f5` | 2026-10-11 20:22:00 | `run.sh`, `run.py`, `records/` | Phase 6: Built-in automated system package update and upgrade (apt/dnf/yum) in launcher | **SUCCESS (Pushed)** |
-| **10** | `caeb615` | 2026-10-11 20:25:00 | `run.sh`, `scripts/install.sh`, `scripts/health_check.sh`, `records/` | Phase 7: Set git 100755 executable permissions on all shell scripts to fix permission denied | **SUCCESS (Pushed)** |
+| **10** | `8add83f` | 2026-10-11 20:25:00 | `run.sh`, `scripts/install.sh`, `scripts/health_check.sh`, `records/` | Phase 7: Set git 100755 executable permissions on all shell scripts to fix permission denied | **SUCCESS (Pushed)** |
+| **11** | `6738348` | 2026-10-11 20:35:00 | `run.sh`, `backend/requirements.txt`, `records/` | Phase 8: EC2 micro 2GB swap OOM protection, system-site-packages, prefer-binary | **SUCCESS (Pushed)** |
 
 ---
 

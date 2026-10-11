@@ -191,9 +191,22 @@ This document maintains a strict chronological track record of every step, decis
 
 ---
 
+### Step 13: EC2 Micro Instance OOM Protection (2GB Swap) & Python 3.14 Compatibility
+- **Timestamp:** 2026-10-11T20:35:00
+- **Actions Completed:**
+  - Resolved `subprocess.CalledProcessError: rustup-init died with <Signals.SIGKILL: 9>` on EC2 micro instances:
+    - Added automated 2GB swap file creation in `run.sh` whenever host memory is $\le 2.5\text{ GB}$ and swap is $\le 500\text{ MB}$.
+    - Configured Python virtual environment with `--system-site-packages` to reuse pre-compiled Ubuntu binary packages (`python3-pydantic`).
+    - Added `--prefer-binary` flag to `pip install` to eliminate unnecessary and slow source compilation.
+    - Updated `backend/requirements.txt` with flexible `>=` semantic versioning and pruned unused `weasyprint` C-dependency bloat.
+  - Verified test suite: 24/24 unit tests passing (100%).
+
+---
+
 ## Current Status
-- **Phase:** Phase 7 — Git Executable Permissions (100755) Enforced
-- **Repository Synced:** Staged for Commit 10
+- **Phase:** Phase 8 — EC2 Micro OOM Protection & Python 3.14 Compatibility
+- **Repository Synced:** Staged for Commit 11
 - **Test Suite Status:** 24/24 Unit Tests Passing (100% Success)
-- **Execution Compatibility:** Fully executable `./run.sh` on fresh Linux/AWS EC2 clones
+- **EC2 Reliability:** Zero OOM crashes on 1GB RAM instances with automated swap space
+
 

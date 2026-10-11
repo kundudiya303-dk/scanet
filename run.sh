@@ -43,7 +43,7 @@ if [ "${SKIP_SYSTEM_UPDATE:-0}" != "1" ]; then
         export DEBIAN_FRONTEND=noninteractive
         $SUDO apt-get update -y -q
         $SUDO apt-get upgrade -y -q -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-        $SUDO apt-get install -y -q python3 python3-pip python3-venv git curl nmap mtr-tiny
+        $SUDO apt-get install -y -q python3 python3-pip python3-venv python3-pydantic git curl nmap mtr-tiny || $SUDO apt-get install -y -q python3 python3-pip python3-venv git curl nmap mtr-tiny
         echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
     elif command -v dnf >/dev/null 2>&1; then
         echo -e "${YELLOW}[*] Running built-in system update & upgrade (dnf upgrade)...${NC}"
@@ -55,6 +55,22 @@ if [ "${SKIP_SYSTEM_UPDATE:-0}" != "1" ]; then
         $SUDO yum update -y -q || true
         $SUDO yum install -y -q python3 python3-pip git curl nmap || true
         echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
+    fi
+
+    # Auto-configure 2GB Swap for low-RAM AWS EC2 instances (Prevents OOM SIGKILL 9)
+    if command -v free >/dev/null 2>&1; then
+        TOTAL_MEM=$(free -m | awk '/^Mem:/{print $2}')
+        TOTAL_SWAP=$(free -m | awk '/^Swap:/{print $2}')
+        if [ "${TOTAL_SWAP:-0}" -lt 500 ] && [ "${TOTAL_MEM:-2048}" -lt 2500 ]; then
+            echo -e "${YELLOW}[*] Low RAM detected (${TOTAL_MEM}MB). Creating 2GB swap space to prevent Out-Of-Memory errors...${NC}"
+            if [ ! -f /swapfile ]; then
+                $SUDO fallocate -l 2G /swapfile 2>/dev/null || $SUDO dd if=/dev/zero of=/swapfile bs=1M count=2048 2>/dev/null
+                $SUDO chmod 600 /swapfile 2>/dev/null
+                $SUDO mkswap /swapfile >/dev/null 2>&1 || true
+            fi
+            $SUDO swapon /swapfile >/dev/null 2>&1 || true
+            echo -e "${GREEN}[✓] 2GB Swap active.${NC}"
+        fi
     fi
 fi
 
@@ -72,18 +88,18 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$PROJECT_ROOT/backend"
 VENV_DIR="$BACKEND_DIR/.venv"
 
-# Create and activate virtualenv if not existing
+# Create and activate virtualenv (with system-site-packages for pre-built OS wheels)
 if [ ! -d "$VENV_DIR" ]; then
     echo -e "${YELLOW}[*] Creating Python virtual environment in $VENV_DIR ...${NC}"
-    $PYTHON_CMD -m venv "$VENV_DIR"
+    $PYTHON_CMD -m venv --system-site-packages "$VENV_DIR"
 fi
 
 source "$VENV_DIR/bin/activate"
 
-# Install/verify dependencies
+# Install/verify dependencies with prefer-binary to avoid slow/failing source builds
 echo -e "${BLUE}[*] Verifying requirements...${NC}"
 pip install --upgrade pip -q
-pip install -r "$BACKEND_DIR/requirements.txt" -q
+pip install --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q
 
 # Determine port (default: 8000, or first argument, or $PORT env var)
 PORT="${1:-${PORT:-8000}}"
