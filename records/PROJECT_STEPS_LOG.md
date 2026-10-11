@@ -180,9 +180,20 @@ This document maintains a strict chronological track record of every step, decis
 
 ---
 
+### Step 12: Git Executable Permissions Enforcement (chmod +x)
+- **Timestamp:** 2026-10-11T20:25:00
+- **Actions Completed:**
+  - Upgraded Git index file mode for all shell scripts from `100644` (non-executable) to `100755` (executable):
+    - `run.sh` -> `100755`
+    - `scripts/install.sh` -> `100755`
+    - `scripts/health_check.sh` -> `100755`
+  - Fixed `-bash: ./run.sh: Permission denied` error: Any new `git clone` or `git pull` on Linux/EC2 now automatically receives native execution permissions without requiring `chmod +x`.
+
+---
+
 ## Current Status
-- **Phase:** Phase 6 — Built-in System Update & Upgrade Automation
-- **Repository Synced:** Staged for Commit 9
+- **Phase:** Phase 7 — Git Executable Permissions (100755) Enforced
+- **Repository Synced:** Staged for Commit 10
 - **Test Suite Status:** 24/24 Unit Tests Passing (100% Success)
-- **Deployment Readiness:** Fully autonomous single-command launch on blank AWS EC2 instances
+- **Execution Compatibility:** Fully executable `./run.sh` on fresh Linux/AWS EC2 clones
 
