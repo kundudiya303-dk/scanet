@@ -44,9 +44,21 @@ python run.py
 
 ---
 
+## 📚 Official Documentation & User Guides
+
+- 📖 **[Complete Dashboard Operator's Guide (Full Step-by-Step Manual)](docs/DASHBOARD_USER_GUIDE.md)** — Exhaustive walkthrough covering every single page, button, tool, and workflow in the web UI.
+- ☁️ **[AWS EC2 Cloud Deployment Guide](docs/AWS_EC2_DEPLOYMENT.md)** — Step-by-step AWS provisioning, Security Group configuration, and direct HTTP access.
+- 📐 **[Master Architecture & Engineering Blueprint](SCANET_MASTER_BLUEPRINT.md)** — Complete system design, threat modeling, and data normalization specs.
+- 🗂️ **[Step-by-Step Project Execution Log](records/PROJECT_STEPS_LOG.md)** — Chronological audit trail of all implementation milestones.
+- 📦 **[GitHub Commit & Upload Tracker](records/GITHUB_UPLOAD_TRACKER.md)** — Version control synchronization registry.
+
+---
+
 ## 🚀 Key Platform Capabilities
 
-- 🔌 **12 Supported Security Tools** — Nmap, Naabu, RustScan, Katana, FFUF, Gobuster, dnsx, Subfinder, HTTPX, Nuclei, MTR, and Passive OSINT.
+- 🔌 **14 Supported Security Engines** — Nmap, Naabu, RustScan, Katana, FFUF, Gobuster, dnsx, Subfinder, HTTPX, Nuclei, MTR, Passive OSINT, Native Nikto/ZAP Web Auditor, and Subdomain Takeover.
+- 🛡️ **Web Security & Misconfiguration Auditor** — Pure-Python asynchronous Nikto & OWASP ZAP equivalent testing HTTP methods (TRACE/PUT/DELETE), sensitive file leaks (.env, .git, backups), cookie directives (HttpOnly, Secure, SameSite), and CORS policies.
+- 🎯 **Subdomain Takeover & DNS AXFR Detector** — Detects orphaned CNAME records pointing to 8+ decommissioned cloud services (AWS S3, GitHub Pages, Heroku, Shopify, CloudFront, Azure, Surge, Bitbucket) and audits DNS zone transfer exposures.
 - 🧠 **AI Security Advisor & MITRE ATT&CK Copilot** — Heuristic rule engine running 100% offline; maps exposures to MITRE ATT&CK TTPs and provides student remediation playbooks.
 - 🎯 **Multi-Vector OS Detection Engine** — Non-root OS fingerprinting combining TCP/IP TTL heuristics (Linux initial 64, Windows initial 128, Cisco initial 255), service banner regexes (SSH/HTTP/FTP), and open port profiles.
 - ☵ **Chained Reconnaissance Pipelines** — One-click automated workflows (Full Attack Surface, Web Security Audit, Network Diagnostics, and Stealth Passive OSINT).
@@ -55,7 +67,7 @@ python run.py
 - 📡 **Real-Time Job Control** — Non-blocking process execution via Linux process groups (`os.setsid`), live Server-Sent Events (SSE) streaming, and deterministic `SIGTERM` cancellation.
 - 📄 **DevSecOps & Multi-Format Reporting** — Exports to **OASIS SARIF v2.1.0** (GitHub Code Scanning & GitLab CI), Executive PDF, Technical HTML, JSON, and CSV.
 - 🔔 **Real-Time Alert Dispatcher** — Formatted alert notifications to Discord, Slack, Telegram, and generic HTTP webhooks.
-- 🧪 **100% Verified Test Suite** — 21 unit tests covering scope enforcement, XML parsing, AI heuristics, CVE version matching, and OS fingerprinting (validated across multiple stress runs).
+- 🧪 **100% Verified Test Suite** — 32 unit tests covering scope enforcement, XML parsing, AI heuristics, CVE version matching, OS fingerprinting, web auditing, and subdomain takeover (100% pass rate).
 
 ---
 
