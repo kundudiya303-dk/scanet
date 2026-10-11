@@ -12,6 +12,7 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 |---|-------------|-------------------|--------------------------|------------------------------|-------------|
 | **1** | `1578508` | 2026-10-11 19:05:07 | `.gitignore`<br>`SCANET_MASTER_BLUEPRINT.md` | Initial commit: scanet research and architecture blueprint | **SUCCESS (Pushed)** |
 | **2** | `382e755` | 2026-10-11 19:08:15 | `records/PROJECT_STEPS_LOG.md`<br>`records/GITHUB_UPLOAD_TRACKER.md` | Add step execution log and GitHub upload tracker | **SUCCESS (Pushed)** |
+| **3** | *(Pending)* | 2026-10-11 19:10:15 | `records/README.md`<br>`records/ARCHITECTURE_DECISIONS.md`<br>`records/TOOL_INTEGRATION_STATUS.md`<br>`records/PROJECT_STEPS_LOG.md`<br>`records/GITHUB_UPLOAD_TRACKER.md` | Add ADR records, tool status matrix, and records index | **SYNCING NOW** |
 
 ---
 
@@ -22,8 +23,11 @@ The following files are currently version-controlled and synchronized with the r
 - `/.gitignore` — Git exclusion rules for clean repository hygiene.
 - `/SCANET_MASTER_BLUEPRINT.md` — Complete master architecture, research comparison, and system specification.
 - `/records/` — Dedicated audit and tracking directory.
+  - `/records/README.md` — Directory index and navigation guide.
   - `/records/PROJECT_STEPS_LOG.md` — Step-by-step record of all project actions and milestones.
   - `/records/GITHUB_UPLOAD_TRACKER.md` — Complete manifest of GitHub commits, files uploaded, and sync statuses.
+  - `/records/ARCHITECTURE_DECISIONS.md` — Architecture Decision Records (ADRs 001–006).
+  - `/records/TOOL_INTEGRATION_STATUS.md` — Tool implementation and adapter status matrix.
 
 ---
 
