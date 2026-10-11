@@ -1,0 +1,1 @@
+"""scanet API routes package."""
