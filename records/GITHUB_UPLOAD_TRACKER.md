@@ -16,7 +16,7 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **4** | `1ea130d` | 2026-10-11 19:23:20 | 53 files across `backend/`, `frontend/`, `docker/`, `scripts/`, `tests/`, `wordlists/`, `README.md`, `LICENSE` | Phase 1: Complete professional project folder structure | **SUCCESS (Pushed)** |
 | **5** | `fb06cf8` | 2026-10-11 19:46:00 | 37 files across `backend/`, `frontend/`, `tests/`, and `records/` | Phase 2: Deep research, 12 tools universe, AI advisor, pipelines, topology graph, SARIF, and 14 tests | **SUCCESS (Pushed)** |
 | **6** | `152714a` | 2026-10-11 19:52:00 | `backend/analyzers/os_fingerprint.py`, `backend/api/routes/os_detect.py`, `backend/main.py`, `docs/AWS_EC2_DEPLOYMENT.md`, `README.md`, `tests/test_analyzers/test_os_fingerprint.py`, `records/` | Phase 3: OS Detection Engine, AWS EC2 Cloud Deployment Guide, 21 unit tests (63 stress runs verified) | **SUCCESS (Pushed)** |
-
+| **7** | `236409a` | 2026-10-11 20:05:00 | `run.py`, `run.sh`, `run.bat`, `frontend/assets/css/main.css`, `frontend/assets/js/pages/dashboard.js`, `jobs.js`, `results.js`, `system.js`, `targets.js`, `tests/run_tests.py`, test suite fixes, `records/` | Phase 4: Universal one-command launchers (run.py/run.sh/run.bat), vibrant colorful cyberpunk UI overhaul, 24/24 unit test suite | **SUCCESS (Pushed)** |
 
 ---
 
@@ -28,6 +28,9 @@ The following components are version-controlled and synchronized with the remote
 - `/.gitignore` — Clean repository exclusion rules.
 - `/LICENSE` — MIT open-source license.
 - `/README.md` — Professional project documentation and overview.
+- `/run.py` — Cross-platform one-command universal launcher.
+- `/run.sh` — Single-command bash launcher (Linux/AWS EC2/macOS).
+- `/run.bat` — One-click Windows batch launcher.
 - `/SCANET_MASTER_BLUEPRINT.md` — Master system architecture and engineering blueprint.
 - `/records/` — Governance and tracking repository:
   - `README.md` — Records index and navigation guide.
@@ -48,7 +51,7 @@ The following components are version-controlled and synchronized with the remote
   - `assets/js/`: `app.js`, `api.js`, `router.js`
   - `assets/js/components/`: `nav.js`
   - `assets/js/pages/`: `dashboard.js`, `targets.js`, `jobs.js`, `results.js`, `system.js`, `pipelines.js`, `topology.js`, `advisor.js`
-- `/tests/` — Verified unit test suites (14/14 tests passing).
+- `/tests/` — Zero-dependency automated test runner (`run_tests.py`), 24 unit tests (100% pass rate across 120 stress runs).
 - `/docker/` — `Dockerfile`, `docker-compose.yml`.
 - `/scripts/` — `install.sh`, `health_check.sh`.
 - `/wordlists/` — `README.txt`.

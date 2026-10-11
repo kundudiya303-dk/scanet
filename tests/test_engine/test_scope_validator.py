@@ -53,6 +53,8 @@ def test_non_whitelisted_target_blocked(validator=None):
     assert "whitelist" in result["reason"].lower()
 
 
-def test_empty_target_rejected(validator):
+def test_empty_target_rejected(validator=None):
+    if validator is None:
+        validator = ScopeValidator(approved_targets=["192.168.1.10", "10.0.0.5"])
     result = validator.validate_target("")
     assert result["valid"] is False

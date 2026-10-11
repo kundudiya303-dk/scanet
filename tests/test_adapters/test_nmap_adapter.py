@@ -71,7 +71,8 @@ def test_empty_output_no_crash(adapter=None):
 
 
 
-def test_command_args_no_shell_strings(adapter):
+def test_command_args_no_shell_strings(adapter=None):
+    if adapter is None: adapter = NmapAdapter()
     args = adapter.build_command_args("192.168.1.10", {"speed": "3", "ports": "top-100"})
     assert isinstance(args, list)
     assert all(isinstance(a, str) for a in args)
