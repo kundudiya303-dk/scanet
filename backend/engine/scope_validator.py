@@ -28,6 +28,19 @@ class ScopeValidator:
     def __init__(self, approved_targets: list[str] | None = None):
         self.approved_targets = approved_targets or []
 
+    @classmethod
+    def validate(cls, target: str) -> tuple[bool, str]:
+        """Convenience classmethod for rapid target validation."""
+        # Strip scheme or paths if passed as URL
+        cleaned = target.strip().lower()
+        if "://" in cleaned:
+            cleaned = cleaned.split("://")[1].split("/")[0].split(":")[0]
+        else:
+            cleaned = cleaned.split("/")[0].split(":")[0]
+        validator = cls()
+        res = validator.validate_target(cleaned, require_whitelist=False)
+        return res["valid"], res["reason"]
+
     def is_hard_blocked(self, ip_str: str) -> tuple[bool, str]:
         """Returns (is_blocked, reason) for a given IP address string."""
         try:
