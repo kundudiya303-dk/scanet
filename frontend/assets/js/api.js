@@ -41,4 +41,10 @@ export const api = {
         es.onerror   = () => es.close();
         return es;
     },
+
+    // Web Security & Misconfiguration Auditor
+    scanWebSecurity:   (url)          => request('/web-audit/scan', { method: 'POST', body: JSON.stringify({ target_url: url }) }),
+    checkTakeover:     (domain, cname) => request('/web-audit/takeover', { method: 'POST', body: JSON.stringify({ domain, cname }) }),
+    checkZoneTransfer: (domain, ns)   => request('/web-audit/zone-transfer', { method: 'POST', body: JSON.stringify({ domain, nameserver: ns }) }),
+    getAuditRules:     ()             => request('/web-audit/rules'),
 };

@@ -23,7 +23,8 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **11** | `bbbb002` | 2026-10-11 20:35:00 | `run.sh`, `backend/requirements.txt`, `records/` | Phase 8: EC2 micro 2GB swap OOM protection, system-site-packages, prefer-binary | **SUCCESS (Pushed)** |
 | **12** | `27fd4ac` | 2026-10-11 20:40:00 | `backend/api/routes/system.py`, `backend/requirements.txt`, `run.sh`, `records/` | Phase 9: Resolved psutil import with pure Python fallback & package addition | **SUCCESS (Pushed)** |
 | **14** | `4264b8e` | 2026-10-11 20:53:22 | `run.sh`, `run.py`, `run.bat`, `.gitattributes`, `records/` | Phase 11: Multi-color gradient ASCII logo, animated progress spinners, interactive TTY panel & LF line endings | **SUCCESS (Pushed)** |
-| **15** | `2f08639` | 2026-10-11 21:00:10 | `frontend/assets/images/`, `frontend/assets/js/components/nav.js`, `frontend/assets/js/pages/dashboard.js`, `frontend/assets/css/main.css`, `frontend/index.html`, `backend/main.py`, `records/` | Phase 12: Unique brand logo identity & dashboard visual integration | **SUCCESS (Pushed)** |
+| **15** | `b8546c5` | 2026-10-11 21:00:10 | `frontend/assets/images/`, `frontend/assets/js/components/nav.js`, `frontend/assets/js/pages/dashboard.js`, `frontend/assets/css/main.css`, `frontend/index.html`, `backend/main.py`, `records/` | Phase 12: Unique brand logo identity & dashboard visual integration | **SUCCESS (Pushed)** |
+| **16** | `fc8278c` | 2026-10-11 21:12:46 | `backend/analyzers/web_auditor.py`, `backend/analyzers/subdomain_takeover.py`, `backend/api/routes/web_audit.py`, `frontend/assets/js/pages/webaudit.js`, `frontend/assets/js/router.js`, `frontend/assets/js/components/nav.js`, `tests/`, `records/` | Phase 13: Integrated Nikto/ZAP Web Security Auditor & Subdomain Takeover Engine (32 unit tests passing) | **SUCCESS (Pushed)** |
 
 ---
 

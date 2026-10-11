@@ -11,6 +11,7 @@ import { renderSystem }    from './pages/system.js';
 import { renderPipelines } from './pages/pipelines.js';
 import { renderTopology }  from './pages/topology.js';
 import { renderAdvisor }   from './pages/advisor.js';
+import { renderWebAudit }  from './pages/webaudit.js';
 
 const ROUTES = {
     ''           : { title: 'Dashboard',             render: renderDashboard },
@@ -19,6 +20,7 @@ const ROUTES = {
     'pipelines'  : { title: 'Recon Pipelines',       render: renderPipelines },
     'jobs'       : { title: 'Live Job Center',       render: renderJobs      },
     'topology'   : { title: 'Attack Surface Graph',  render: renderTopology  },
+    'webaudit'   : { title: 'Web Security Auditor',  render: renderWebAudit  },
     'results'    : { title: 'Results Explorer',      render: renderResults   },
     'advisor'    : { title: 'AI Security Advisor',   render: renderAdvisor   },
     'system'     : { title: 'System Health',         render: renderSystem    },

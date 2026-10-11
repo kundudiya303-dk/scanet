@@ -21,6 +21,8 @@ def discover_and_run(iterations=1):
         os.path.join(PROJECT_ROOT, "tests", "test_analyzers", "test_ai_advisor.py"),
         os.path.join(PROJECT_ROOT, "tests", "test_analyzers", "test_cve_correlator.py"),
         os.path.join(PROJECT_ROOT, "tests", "test_analyzers", "test_os_fingerprint.py"),
+        os.path.join(PROJECT_ROOT, "tests", "test_analyzers", "test_web_auditor.py"),
+        os.path.join(PROJECT_ROOT, "tests", "test_analyzers", "test_subdomain_takeover.py"),
         os.path.join(PROJECT_ROOT, "tests", "test_engine", "test_scope_validator.py"),
     ]
 

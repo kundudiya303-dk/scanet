@@ -33,6 +33,9 @@ export function renderNav(container) {
         <a class="nav-item" data-route="topology"  href="#/topology">
             <span class="nav-icon">☊</span> Topology Graph
         </a>
+        <a class="nav-item" data-route="webaudit"  href="#/webaudit">
+            <span class="nav-icon">🛡️</span> Web Security Auditor
+        </a>
         <a class="nav-item" data-route="results"   href="#/results">
             <span class="nav-icon">≡</span> Results Explorer
         </a>

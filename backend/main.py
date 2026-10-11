@@ -11,7 +11,7 @@ import uvicorn
 
 from config import settings
 from database.connection import init_db
-from api.routes import targets, jobs, results, system, pipelines, advisor, topology, os_detect
+from api.routes import targets, jobs, results, system, pipelines, advisor, topology, os_detect, web_audit
 
 
 @asynccontextmanager
@@ -48,6 +48,7 @@ app.include_router(pipelines.router, prefix="/api/v1/pipelines", tags=["Pipeline
 app.include_router(advisor.router,   prefix="/api/v1/advisor",   tags=["AI Advisor"])
 app.include_router(topology.router,  prefix="/api/v1/topology",  tags=["Topology Graph"])
 app.include_router(os_detect.router, prefix="/api/v1/os-detect", tags=["OS Detection"])
+app.include_router(web_audit.router, prefix="/api/v1/web-audit", tags=["Web Security Auditor"])
 
 
 
