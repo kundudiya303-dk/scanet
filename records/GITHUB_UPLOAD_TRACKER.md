@@ -17,7 +17,8 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **5** | `fb06cf8` | 2026-10-11 19:46:00 | 37 files across `backend/`, `frontend/`, `tests/`, and `records/` | Phase 2: Deep research, 12 tools universe, AI advisor, pipelines, topology graph, SARIF, and 14 tests | **SUCCESS (Pushed)** |
 | **6** | `152714a` | 2026-10-11 19:52:00 | `backend/analyzers/os_fingerprint.py`, `backend/api/routes/os_detect.py`, `backend/main.py`, `docs/AWS_EC2_DEPLOYMENT.md`, `README.md`, `tests/test_analyzers/test_os_fingerprint.py`, `records/` | Phase 3: OS Detection Engine, AWS EC2 Cloud Deployment Guide, 21 unit tests (63 stress runs verified) | **SUCCESS (Pushed)** |
 | **7** | `b421f29` | 2026-10-11 20:05:00 | `run.py`, `run.sh`, `run.bat`, `frontend/assets/css/main.css`, `frontend/assets/js/pages/dashboard.js`, `jobs.js`, `results.js`, `system.js`, `targets.js`, `tests/run_tests.py`, test suite fixes, `records/` | Phase 4: Universal one-command launchers (run.py/run.sh/run.bat), vibrant colorful cyberpunk UI overhaul, 24/24 unit test suite | **SUCCESS (Pushed)** |
-| **8** | `aee60e2` | 2026-10-11 20:15:00 | `run.sh`, `run.py`, `README.md`, `docs/AWS_EC2_DEPLOYMENT.md`, `records/` | Phase 5: Direct HTTP access over EC2 Public IP on custom/default port (no domain/HTTPS needed) | **SUCCESS (Pushed)** |
+| **8** | `50eac5f` | 2026-10-11 20:15:00 | `run.sh`, `run.py`, `README.md`, `docs/AWS_EC2_DEPLOYMENT.md`, `records/` | Phase 5: Direct HTTP access over EC2 Public IP on custom/default port (no domain/HTTPS needed) | **SUCCESS (Pushed)** |
+| **9** | `cfdc27b` | 2026-10-11 20:22:00 | `run.sh`, `run.py`, `records/` | Phase 6: Built-in automated system package update and upgrade (apt/dnf/yum) in launcher | **SUCCESS (Pushed)** |
 
 ---
 

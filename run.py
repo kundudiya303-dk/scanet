@@ -49,9 +49,10 @@ def setup_environment():
         import aiosqlite
         print("\033[92m[✓] Core dependencies present.\033[0m")
     except ImportError:
-        print("\033[93m[*] Installing dependencies from requirements.txt...\033[0m")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", req_file])
-        print("\033[92m[✓] Dependencies installed successfully.\033[0m")
+        print("\033[93m[*] Upgrading pip and installing dependencies from requirements.txt...\033[0m")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip", "-q"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", req_file, "-q"])
+        print("\033[92m[✓] Dependencies installed and upgraded successfully.\033[0m")
 
 def get_public_ip():
     try:

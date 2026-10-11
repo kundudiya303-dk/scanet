@@ -166,8 +166,23 @@ This document maintains a strict chronological track record of every step, decis
 
 ---
 
+### Step 11: Built-in Automated System Package Update & Upgrade in Launch Script
+- **Timestamp:** 2026-10-11T20:22:00
+- **Actions Completed:**
+  - Upgraded `run.sh` with automated system update and upgrade routines:
+    - Automatically detects Linux distribution package managers (`apt-get` for Ubuntu/Debian, `dnf` for Amazon Linux 2023/Fedora, `yum` for Amazon Linux 2/CentOS).
+    - Runs non-interactive system update & upgrade (`DEBIAN_FRONTEND=noninteractive apt-get update && apt-get upgrade -y -q`) without requiring manual pre-configuration.
+    - Automatically installs missing system tools (`python3`, `python3-pip`, `python3-venv`, `git`, `curl`, `nmap`, `mtr-tiny`).
+    - Uses non-blocking flags (`--force-confdef`, `--force-confold`) to eliminate terminal curses dialogs on EC2 instances.
+  - Upgraded `run.py`:
+    - Automatically upgrades `pip` to latest version prior to dependency checks.
+  - Verified zero errors across test suite (24/24 passing).
+
+---
+
 ## Current Status
-- **Phase:** Phase 5 — Direct HTTP Public IP & Dynamic Port Binding for AWS EC2
-- **Repository Synced:** Staged for Commit 8
+- **Phase:** Phase 6 — Built-in System Update & Upgrade Automation
+- **Repository Synced:** Staged for Commit 9
 - **Test Suite Status:** 24/24 Unit Tests Passing (100% Success)
-- **EC2 Access Model:** Direct HTTP via `<EC2_PUBLIC_IP>:8000` (No domain or SSL needed)
+- **Deployment Readiness:** Fully autonomous single-command launch on blank AWS EC2 instances
+

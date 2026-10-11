@@ -29,6 +29,35 @@ EOF
 
 echo -e "${CYAN}[*] Initializing scanet universal launcher...${NC}"
 
+# ==============================================================================
+# Built-in System Package Update & Upgrade (Automated for AWS EC2 / Linux)
+# ==============================================================================
+if [ "${SKIP_SYSTEM_UPDATE:-0}" != "1" ]; then
+    SUDO=""
+    if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+        SUDO="sudo"
+    fi
+
+    if command -v apt-get >/dev/null 2>&1; then
+        echo -e "${YELLOW}[*] Running built-in system update & upgrade (apt-get update && upgrade)...${NC}"
+        export DEBIAN_FRONTEND=noninteractive
+        $SUDO apt-get update -y -q
+        $SUDO apt-get upgrade -y -q -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+        $SUDO apt-get install -y -q python3 python3-pip python3-venv git curl nmap mtr-tiny
+        echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
+    elif command -v dnf >/dev/null 2>&1; then
+        echo -e "${YELLOW}[*] Running built-in system update & upgrade (dnf upgrade)...${NC}"
+        $SUDO dnf upgrade -y -q || true
+        $SUDO dnf install -y -q python3 python3-pip git curl nmap || true
+        echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
+    elif command -v yum >/dev/null 2>&1; then
+        echo -e "${YELLOW}[*] Running built-in system update & upgrade (yum update)...${NC}"
+        $SUDO yum update -y -q || true
+        $SUDO yum install -y -q python3 python3-pip git curl nmap || true
+        echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
+    fi
+fi
+
 # Check for Python 3.10+
 if command -v python3 >/dev/null 2>&1; then
     PYTHON_CMD="python3"
