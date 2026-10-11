@@ -9,15 +9,27 @@ import platform
 import subprocess
 import urllib.request
 import socket
+import time
 
-# ANSI Color Codes
+# Enforce UTF-8 encoding across Windows, Linux, and macOS consoles
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+# Cyberpunk High-Contrast Color Palette (256-Color & ANSI Supported)
 C_RESET = "\033[0m"
 C_BOLD = "\033[1m"
 C_DIM = "\033[2m"
+C_UNDERLINE = "\033[4m"
+
+# Vivid Neon Accents
 C_CYAN = "\033[38;5;51m"
-C_SKY = "\033[38;5;39m"
+C_SKY = "\033[38;5;45m"
+C_BLUE = "\033[38;5;39m"
 C_PURPLE = "\033[38;5;141m"
 C_MAGENTA = "\033[38;5;201m"
+C_PINK = "\033[38;5;213m"
 C_GREEN = "\033[38;5;48m"
 C_LIME = "\033[38;5;154m"
 C_YELLOW = "\033[38;5;226m"
@@ -26,15 +38,6 @@ C_RED = "\033[38;5;196m"
 C_WHITE = "\033[38;5;231m"
 C_GRAY = "\033[38;5;245m"
 C_DARK = "\033[38;5;238m"
-
-BANNER = r"""
-  ███████╗ ██████╗ █████╗ ███╗   ██╗███████╗████████╗
-  ██╔════╝██╔════╝██╔══██╗████╗  ██║██╔════╝╚══██╔══╝
-  ███████╗██║     ███████║██╔██╗ ██║█████╗     ██║   
-  ╚════██║██║     ██╔══██║██║╚██╗██║██╔══╝     ██║   
-  ███████║╚██████╗██║  ██║██║ ╚████║███████╗   ██║   
-  ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   
-"""
 
 def print_banner():
     # Enable ANSI escape sequences on Windows consoles if needed
@@ -46,9 +49,16 @@ def print_banner():
         except Exception:
             pass
 
-    print(f"{C_CYAN}{BANNER}{C_RESET}")
+    print()
+    print(f"{C_CYAN}   ███████╗ ██████╗ █████╗ ███╗   ██╗███████╗████████╗{C_RESET}")
+    print(f"{C_SKY}   ██╔════╝██╔════╝██╔══██╗████╗  ██║██╔════╝╚══██╔══╝{C_RESET}")
+    print(f"{C_BLUE}   ███████╗██║     ███████║██╔██╗ ██║█████╗     ██║   {C_RESET}")
+    print(f"{C_PURPLE}   ╚════██║██║     ██╔══██║██║╚██╗██║██╔══╝     ██║   {C_RESET}")
+    print(f"{C_MAGENTA}   ███████║╚██████╗██║  ██║██║ ╚████║███████╗   ██║   {C_RESET}")
+    print(f"{C_PINK}   ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   {C_RESET}")
+    print()
     print(f"  {C_PURPLE}⚡ WEB-ORCHESTRATED CYBERSECURITY RECONNAISSANCE PLATFORM{C_RESET}")
-    print(f"  {C_SKY}🔒 12-Tool Recon · OS Fingerprinting · AI MITRE ATT&CK Copilot · SARIF v2.1{C_RESET}")
+    print(f"  {C_BLUE}🔒 12 Recon Engines · OS Fingerprinting · AI MITRE ATT&CK · SARIF v2.1{C_RESET}")
     print(f"  {C_DARK}─────────────────────────────────────────────────────────────────────────────{C_RESET}")
 
 def get_public_ip():
@@ -69,14 +79,41 @@ def print_host_audit(port, public_ip):
     py_ver = platform.python_version()
 
     print(f"\n  {C_BOLD}{C_WHITE}╭─── 🖥️  HOST ENVIRONMENT AUDIT ──────────────────────────────────────────────╮{C_RESET}")
-    print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Node Host:{C_RESET}     {C_WHITE}{hostname}{C_RESET} ({arch})")
-    print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Operating Sys:{C_RESET} {C_WHITE}{os_name}{C_RESET} | Python {C_YELLOW}{py_ver}{C_RESET}")
+    print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Node Host:{C_RESET}       {C_WHITE}{hostname}{C_RESET} ({arch})")
+    print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Operating Sys:{C_RESET}   {C_WHITE}{os_name}{C_RESET} │ Python {C_YELLOW}{py_ver}{C_RESET}")
     if public_ip:
-        print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Public IPv4:{C_RESET}   {C_LIME}{public_ip}{C_RESET} {C_DIM}(Cloud / External Access){C_RESET}")
+        print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Public IPv4:{C_RESET}     {C_LIME}{public_ip}{C_RESET} {C_DIM}(Cloud / External Access Detected){C_RESET}")
     else:
-        print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Public IPv4:{C_RESET}   {C_GRAY}Private / Local Subnet{C_RESET}")
-    print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Target Port:{C_RESET}   {C_CYAN}TCP {port}{C_RESET} {C_DIM}(HTTP){C_RESET}")
+        print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Public IPv4:{C_RESET}     {C_GRAY}Private / Local Subnet{C_RESET}")
+    print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Target Port:{C_RESET}     {C_CYAN}TCP {port}{C_RESET} {C_DIM}(HTTP Direct Access){C_RESET}")
     print(f"  {C_BOLD}{C_WHITE}╰─────────────────────────────────────────────────────────────────────────────╯{C_RESET}\n")
+
+def prompt_interactive(port):
+    if not sys.stdin.isatty() or os.environ.get("SCANET_NON_INTERACTIVE") == "1":
+        return port
+
+    print(f"  {C_BOLD}{C_WHITE}╭─── 🎮 INTERACTIVE CONTROL ───────────────────────────────────────────────────╮{C_RESET}")
+    print(f"  {C_WHITE}│{C_RESET}  {C_CYAN}[1]{C_RESET} {C_BOLD}🚀 Launch Web Platform{C_RESET} {C_DIM}(Default - Press ENTER to launch){C_RESET}               {C_WHITE}│{C_RESET}")
+    print(f"  {C_WHITE}│{C_RESET}  {C_YELLOW}[2]{C_RESET} {C_BOLD}🔧 Change HTTP Port{C_RESET}    {C_DIM}(Current: TCP {port}){C_RESET}                                   {C_WHITE}│{C_RESET}")
+    print(f"  {C_WHITE}│{C_RESET}  {C_PURPLE}[3]{C_RESET} {C_BOLD}🩺 Self-Diagnostics{C_RESET}    {C_DIM}(Check interfaces & system resources){C_RESET}          {C_WHITE}│{C_RESET}")
+    print(f"  {C_BOLD}{C_WHITE}╰─────────────────────────────────────────────────────────────────────────────╯{C_RESET}")
+
+    try:
+        # Non-blocking prompt on Windows/Unix with short fallback
+        choice = input(f"  {C_SKY}Select option [1-3] or press [ENTER] to launch:{C_RESET} ").strip()
+        if choice == "2":
+            new_port = input(f"  {C_YELLOW}Enter custom HTTP port [default: 8000]:{C_RESET} ").strip()
+            if new_port.isdigit():
+                port = int(new_port)
+                print(f"  {C_GREEN}✓ Port updated to TCP {port}{C_RESET}\n")
+        elif choice == "3":
+            print(f"\n  {C_SKY}--- RUNNING SELF-DIAGNOSTICS ---{C_RESET}")
+            print(f"  {C_DIM}CPU Count:{C_RESET}  {os.cpu_count() or 1} Cores")
+            print(f"  {C_DIM}Platform:{C_RESET}   {platform.platform()}")
+            print(f"  {C_GREEN}✓ System ready for reconnaissance pipeline.{C_RESET}\n")
+    except Exception:
+        pass
+    return port
 
 def check_python():
     if sys.version_info < (3, 10):
@@ -148,6 +185,7 @@ if __name__ == "__main__":
     print_banner()
     public_ip = get_public_ip()
     print_host_audit(port, public_ip)
+    port = prompt_interactive(port)
     check_python()
     setup_environment()
     start_server(port, public_ip)
