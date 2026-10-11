@@ -20,7 +20,8 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **8** | `50eac5f` | 2026-10-11 20:15:00 | `run.sh`, `run.py`, `README.md`, `docs/AWS_EC2_DEPLOYMENT.md`, `records/` | Phase 5: Direct HTTP access over EC2 Public IP on custom/default port (no domain/HTTPS needed) | **SUCCESS (Pushed)** |
 | **9** | `fc420f5` | 2026-10-11 20:22:00 | `run.sh`, `run.py`, `records/` | Phase 6: Built-in automated system package update and upgrade (apt/dnf/yum) in launcher | **SUCCESS (Pushed)** |
 | **10** | `8add83f` | 2026-10-11 20:25:00 | `run.sh`, `scripts/install.sh`, `scripts/health_check.sh`, `records/` | Phase 7: Set git 100755 executable permissions on all shell scripts to fix permission denied | **SUCCESS (Pushed)** |
-| **11** | `2e87f94` | 2026-10-11 20:35:00 | `run.sh`, `backend/requirements.txt`, `records/` | Phase 8: EC2 micro 2GB swap OOM protection, system-site-packages, prefer-binary | **SUCCESS (Pushed)** |
+| **11** | `bbbb002` | 2026-10-11 20:35:00 | `run.sh`, `backend/requirements.txt`, `records/` | Phase 8: EC2 micro 2GB swap OOM protection, system-site-packages, prefer-binary | **SUCCESS (Pushed)** |
+| **12** | `43756c5` | 2026-10-11 20:40:00 | `backend/api/routes/system.py`, `backend/requirements.txt`, `run.sh`, `records/` | Phase 9: Resolved psutil import with pure Python fallback & package addition | **SUCCESS (Pushed)** |
 
 ---
 

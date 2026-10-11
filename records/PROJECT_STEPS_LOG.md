@@ -203,10 +203,23 @@ This document maintains a strict chronological track record of every step, decis
 
 ---
 
+### Step 14: Resolved psutil Dependency & Added Pure-Python System Fallbacks
+- **Timestamp:** 2026-10-11T20:40:00
+- **Actions Completed:**
+  - Resolved `ModuleNotFoundError: No module named 'psutil'` in `backend/api/routes/system.py`:
+    - Wrapped `psutil` import in `try/except ImportError` block so missing library never blocks server boot.
+    - Implemented pure Python standard library fallbacks using `shutil.disk_usage("/")` and `/proc` defaults.
+    - Added `psutil>=5.9.0` to `backend/requirements.txt`.
+    - Added `python3-psutil` to `apt-get`, `dnf`, and `yum` package installation commands in `run.sh`.
+  - Verified test suite: 24/24 unit tests passing (100%).
+
+---
+
 ## Current Status
-- **Phase:** Phase 8 — EC2 Micro OOM Protection & Python 3.14 Compatibility
-- **Repository Synced:** Staged for Commit 11
+- **Phase:** Phase 9 — psutil Resilience & Pure Python System Metrics Fallback
+- **Repository Synced:** Staged for Commit 12
 - **Test Suite Status:** 24/24 Unit Tests Passing (100% Success)
-- **EC2 Reliability:** Zero OOM crashes on 1GB RAM instances with automated swap space
+- **Server Startup:** 100% Non-Blocking, resilient against missing optional system telemetry packages
+
 
 

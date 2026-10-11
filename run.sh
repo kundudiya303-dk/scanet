@@ -43,17 +43,17 @@ if [ "${SKIP_SYSTEM_UPDATE:-0}" != "1" ]; then
         export DEBIAN_FRONTEND=noninteractive
         $SUDO apt-get update -y -q
         $SUDO apt-get upgrade -y -q -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-        $SUDO apt-get install -y -q python3 python3-pip python3-venv python3-pydantic git curl nmap mtr-tiny || $SUDO apt-get install -y -q python3 python3-pip python3-venv git curl nmap mtr-tiny
+        $SUDO apt-get install -y -q python3 python3-pip python3-venv python3-pydantic python3-psutil git curl nmap mtr-tiny || $SUDO apt-get install -y -q python3 python3-pip python3-venv git curl nmap mtr-tiny
         echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
     elif command -v dnf >/dev/null 2>&1; then
         echo -e "${YELLOW}[*] Running built-in system update & upgrade (dnf upgrade)...${NC}"
         $SUDO dnf upgrade -y -q || true
-        $SUDO dnf install -y -q python3 python3-pip git curl nmap || true
+        $SUDO dnf install -y -q python3 python3-pip python3-psutil git curl nmap || true
         echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
     elif command -v yum >/dev/null 2>&1; then
         echo -e "${YELLOW}[*] Running built-in system update & upgrade (yum update)...${NC}"
         $SUDO yum update -y -q || true
-        $SUDO yum install -y -q python3 python3-pip git curl nmap || true
+        $SUDO yum install -y -q python3 python3-pip python3-psutil git curl nmap || true
         echo -e "${GREEN}[✓] System packages updated and upgraded successfully.${NC}"
     fi
 
