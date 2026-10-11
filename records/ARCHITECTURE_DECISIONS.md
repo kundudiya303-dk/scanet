@@ -74,3 +74,12 @@ This document formalizes critical design and engineering decisions made during t
 - **Decision:** Implement native OASIS SARIF v2.1.0 generation in `backend/analyzers/sarif_exporter.py` alongside standard JSON, HTML, PDF, and CSV exports.
 - **Rationale:** Enables direct automated upload of scanet findings into GitHub Code Scanning Alerts and modern DevSecOps vulnerability management systems.
 
+---
+
+### ADR-010: Unprivileged Multi-Vector OS Detection Engine
+- **Status:** Accepted
+- **Context:** Traditional raw socket OS fingerprinting (e.g., Nmap `-O`) requires root privileges (`CAP_NET_RAW` or `sudo`), which compromises web service process security, causes container failures, and triggers cloud hypervisor abuse alarms.
+- **Decision:** Implement a layered, unprivileged heuristic OS detection engine (`OSFingerprintEngine`) combining IP TTL distance analysis, service banner regex extraction (SSH, HTTP Server, FTP, SMB), and open port portfolio profiling (Windows NetBIOS/SMB/RDP vs Linux SSH/NFS).
+- **Rationale:** Delivers high-accuracy operating system identification with zero root privilege requirements, zero raw socket dependencies, and full container/cloud compatibility.
+
+

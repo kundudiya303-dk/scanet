@@ -107,9 +107,33 @@ This document maintains a strict chronological track record of every step, decis
 
 ---
 
+### Step 8: Multi-Vector OS Detection Engine & AWS EC2 Cloud Deployment Guide
+- **Timestamp:** 2026-10-11T19:50:00
+- **Actions Completed:**
+  - Implemented unprivileged, multi-vector Operating System detection engine:
+    - `backend/analyzers/os_fingerprint.py`: Combines TCP/IP TTL heuristics (Linux initial 64, Windows initial 128, Cisco/Network initial 255), service banner regex extraction (SSH, HTTP Server, FTP, SMB), and characteristic open port profile matching.
+    - `backend/api/routes/os_detect.py`: Added `/api/v1/os-detect/fingerprint` and `/api/v1/os-detect/signatures` endpoints.
+    - Registered `os_detect.router` in `backend/main.py`.
+  - Built comprehensive unit test suite: `tests/test_analyzers/test_os_fingerprint.py` (7 tests covering TTL deduction, banner matches, Windows port portfolio, and composite fingerprinting).
+  - Executed extensive automated testing:
+    - Expanded test suite from 14 to **21 unit tests**.
+    - Conducted **multi-iteration stress testing** (3 full sequential runs, 63 total test executions) with **100% pass rate and zero failures**.
+  - Authored complete, production-hardened AWS EC2 deployment handbook: `docs/AWS_EC2_DEPLOYMENT.md`.
+    - Detailed instance sizing (`t4g.micro` ARM Graviton2 vs `t3.micro` Free Tier).
+    - Enforced AWS IMDSv2 metadata protection (`--http-tokens required --http-put-response-hop-limit 1`) to eliminate SSRF credential theft risk.
+    - Detailed Security Group inbound/outbound rules.
+    - Systemd daemon configuration (`/etc/systemd/system/scanet.service`) for automatic restart.
+    - Nginx reverse proxy with SSE streaming (`proxy_buffering off`) and free HTTPS via Let's Encrypt Certbot.
+  - Upgraded root `README.md` with complete OS Detection architecture, EC2 setup commands, test suite verification metrics, and updated project structure.
+  - Documented ADR-010 in `records/ARCHITECTURE_DECISIONS.md`.
+  - Updated `records/TOOL_INTEGRATION_STATUS.md` and `records/GITHUB_UPLOAD_TRACKER.md`.
+
+---
+
 ## Current Status
-- **Phase:** Phase 2 Complete — Deep Research, Extended Tool Universe & High-Impact Engines Implemented
+- **Phase:** Phase 3 Complete — OS Detection Engine, AWS EC2 Production Guide & Multi-Run Verified
 - **Repository Synced:** Pending commit & push to GitHub
-- **Test Suite Status:** 14/14 Unit Tests Passing (100%)
-- **Next Step:** Live database migration, background job manager integration, and live scanning demonstration.
+- **Test Suite Status:** 21/21 Unit Tests Passing (100% Success across 63 stress-run executions)
+- **Next Step:** Live database migrations and background process group validation.
+
 

@@ -11,7 +11,7 @@ import uvicorn
 
 from config import settings
 from database.connection import init_db
-from api.routes import targets, jobs, results, system, pipelines, advisor, topology
+from api.routes import targets, jobs, results, system, pipelines, advisor, topology, os_detect
 
 
 @asynccontextmanager
@@ -47,6 +47,8 @@ app.include_router(system.router,    prefix="/api/v1/system",    tags=["System"]
 app.include_router(pipelines.router, prefix="/api/v1/pipelines", tags=["Pipelines"])
 app.include_router(advisor.router,   prefix="/api/v1/advisor",   tags=["AI Advisor"])
 app.include_router(topology.router,  prefix="/api/v1/topology",  tags=["Topology Graph"])
+app.include_router(os_detect.router, prefix="/api/v1/os-detect", tags=["OS Detection"])
+
 
 
 # ── Serve Frontend Static Files ───────────────────────────────────────────────

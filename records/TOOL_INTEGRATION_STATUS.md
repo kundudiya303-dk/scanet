@@ -31,6 +31,8 @@
 | **SARIF Exporter** | DevSecOps / GitHub Security | **Tier 1 (Native)**| **Implemented** | `backend/analyzers/sarif_exporter.py`| OASIS SARIF v2.1.0 JSON | Tested |
 | **Webhook Notifier**| Discord, Slack & Webhooks | **Tier 1 (Native)**| **Implemented** | `backend/analyzers/webhook_notifier.py`| Real-time HTTP Dispatch | Tested |
 | **Pipelines Manager**| Multi-Tool Orchestration | **Tier 1 (Engine)**| **Implemented** | `backend/engine/pipeline_manager.py`| Chained Stage Execution | Tested |
+| **OS Detection Engine**| Multi-Vector OS Fingerprint | **Tier 1 (Native)**| **Implemented** | `backend/analyzers/os_fingerprint.py` | Composite Fingerprint JSON | Tested |
+
 
 ---
 
