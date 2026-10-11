@@ -5,17 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>scanet — Cybersecurity Reconnaissance Platform</title>
     <meta name="description" content="scanet: A lightweight, modular, web-based cybersecurity reconnaissance and diagnostic platform." />
+    <link rel="icon" type="image/svg+xml" href="/assets/images/scanet_emblem.svg" />
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" />
 </head>
 <body>
     <!-- App Root — populated by app.js -->
     <div id="app">
         <div id="loading-screen">
-            <div class="loader-logo">scanet</div>
+            <div class="loader-logo-wrap">
+                <img src="/assets/images/scanet_emblem.svg" alt="scanet emblem" class="loader-logo-img" />
+                <div class="loader-logo">scan<span>et</span></div>
+            </div>
             <div class="loader-spinner"></div>
-            <p>Initializing platform...</p>
+            <p>Initializing cybersecurity reconnaissance platform...</p>
         </div>
     </div>
     <script type="module" src="/assets/js/app.js"></script>

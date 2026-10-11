@@ -3,7 +3,17 @@
  */
 export function renderNav(container) {
     container.innerHTML = `
-        <div class="sidebar-logo">scan<span>et</span></div>
+        <div class="sidebar-logo-container">
+            <a href="#/dashboard" class="sidebar-logo-link" title="scanet Cybersecurity Reconnaissance">
+                <div class="sidebar-logo-badge">
+                    <img src="/assets/images/scanet_emblem.svg" alt="scanet emblem" class="sidebar-logo-img" />
+                </div>
+                <div class="sidebar-logo-text">
+                    <span class="logo-title">scan<span class="logo-net">et</span></span>
+                    <span class="logo-subtitle">CYBER RECON</span>
+                </div>
+            </a>
+        </div>
 
         <span class="nav-section-label">Overview</span>
         <a class="nav-item" data-route="dashboard" href="#/dashboard">

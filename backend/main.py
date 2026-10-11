@@ -58,6 +58,12 @@ app.mount("/assets", StaticFiles(directory="../frontend/assets"), name="assets")
 async def serve_frontend():
     return FileResponse("../frontend/index.html")
 
+@app.get("/favicon.ico", include_in_schema=False)
+@app.get("/favicon.svg", include_in_schema=False)
+async def serve_favicon():
+    return FileResponse("../frontend/assets/images/scanet_emblem.svg")
+
+
 
 if __name__ == "__main__":
     uvicorn.run(

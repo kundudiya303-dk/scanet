@@ -5,23 +5,30 @@ import { api } from '../api.js';
 
 export async function renderDashboard(container) {
     container.innerHTML = `
-        <!-- Welcome Hero Banner -->
-        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(6, 182, 212, 0.15) 50%, rgba(16, 185, 129, 0.1) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--radius-lg); padding: 1.75rem 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);">
-            <div>
-                <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
-                    <span class="badge badge-emerald"><span class="badge-pulse"></span> SYSTEM ONLINE</span>
-                    <span class="badge badge-cyan">v0.3.0 PRODUCTION</span>
-                    <span class="badge badge-indigo">12 TOOLS REGISTERED</span>
+        <!-- Welcome Hero Banner with Brand Logo -->
+        <div class="dashboard-hero-banner">
+            <div class="hero-brand-flex">
+                <div class="hero-logo-shield">
+                    <img src="/assets/images/scanet_emblem.svg" alt="scanet emblem" class="hero-logo-img" />
+                    <div class="hero-logo-pulse"></div>
                 </div>
-                <h1 style="font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.4rem;">
-                    Cybersecurity Reconnaissance & Diagnostic Center
-                </h1>
-                <p style="color: var(--color-text-muted); font-size: 0.95rem; max-width: 680px;">
-                    Lightweight, modular platform orchestrating port scanning, OS fingerprinting, web fuzzing, DNS resolution, and AI security advisories.
-                </p>
+                <div class="hero-content-col">
+                    <div class="hero-badges-row">
+                        <span class="badge badge-emerald"><span class="badge-pulse"></span> SYSTEM ONLINE</span>
+                        <span class="badge badge-cyan">v0.3.0 PRODUCTION</span>
+                        <span class="badge badge-indigo">12 TOOLS REGISTERED</span>
+                        <span class="badge badge-purple">AI MITRE COPILOT</span>
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="brand-glow-name">SCANET</span> Reconnaissance & Attack Surface Management
+                    </h1>
+                    <p class="hero-desc">
+                        Lightweight web-orchestrated platform orchestrating multi-vector port scanning, unprivileged OS fingerprinting, web fuzzing, DNS discovery, and autonomous AI vulnerability playbooks.
+                    </p>
+                </div>
             </div>
-            <div style="display: flex; gap: 0.75rem;">
-                <a href="#/pipelines" class="btn btn-primary">⚡ Launch Pipeline</a>
+            <div class="hero-actions-col">
+                <a href="#/pipelines" class="btn btn-primary" style="box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);">⚡ Launch Pipeline</a>
                 <a href="#/jobs" class="btn btn-secondary">▷ Custom Scan</a>
             </div>
         </div>
