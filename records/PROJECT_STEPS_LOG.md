@@ -152,11 +152,22 @@ This document maintains a strict chronological track record of every step, decis
 
 ---
 
+### Step 10: Direct HTTP Public IP Access & Dynamic Port Binding for AWS EC2
+- **Timestamp:** 2026-10-11T20:15:00
+- **Actions Completed:**
+  - Upgraded universal launchers (`run.sh` and `run.py`):
+    - Added automatic EC2 Public IP address discovery (via `https://checkip.amazonaws.com`).
+    - Added dynamic port configuration (supports `./run.sh 8000`, `./run.sh 8080`, `sudo ./run.sh 80`, or custom `$PORT`).
+    - Configured terminal output to explicitly display the exact public URL: `http://<EC2_PUBLIC_IP>:<PORT>`.
+  - Streamlined AWS EC2 documentation:
+    - Added prominent 60-second quickstart guide to root `README.md` and `docs/AWS_EC2_DEPLOYMENT.md`.
+    - Documented simple direct HTTP access over EC2 Public IP with port 8000 Security Group rule (no domain / no HTTPS required).
+  - Verified test suite: 24/24 unit tests passing (100%).
+
+---
+
 ## Current Status
-- **Phase:** Phase 4 Complete — Universal One-Command Launcher, Vibrant Cyberpunk UI & Full Test Verification
-- **Repository Synced:** Staged for Commit 7
-- **Test Suite Status:** 24/24 Unit Tests Passing (100% Success across 120 stress-run executions)
-- **Launch Verification:** Verified cross-platform one-command launcher (`run.py`, `run.sh`, `run.bat`)
-
-
-
+- **Phase:** Phase 5 — Direct HTTP Public IP & Dynamic Port Binding for AWS EC2
+- **Repository Synced:** Staged for Commit 8
+- **Test Suite Status:** 24/24 Unit Tests Passing (100% Success)
+- **EC2 Access Model:** Direct HTTP via `<EC2_PUBLIC_IP>:8000` (No domain or SSL needed)

@@ -53,17 +53,30 @@ def setup_environment():
         subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", req_file])
         print("\033[92m[✓] Dependencies installed successfully.\033[0m")
 
-def start_server():
+def get_public_ip():
+    try:
+        import urllib.request
+        with urllib.request.urlopen("https://checkip.amazonaws.com", timeout=2) as response:
+            return response.read().decode().strip()
+    except Exception:
+        return None
+
+def start_server(port=8000):
     root_dir = os.path.dirname(os.path.abspath(__file__))
     backend_dir = os.path.join(root_dir, "backend")
     sys.path.insert(0, backend_dir)
 
-    print("\n\033[92m[✓] Starting scanet server on http://localhost:8000 ...\033[0m")
+    public_ip = get_public_ip()
+
+    print(f"\n\033[92m[✓] Starting scanet server on port {port}...\033[0m")
     print("\033[96m" + "─" * 60 + "\033[0m")
-    print("  🌐 Web Dashboard:    \033[1;36mhttp://localhost:8000\033[0m")
-    print("  📚 API Documentation: \033[1;34mhttp://localhost:8000/docs\033[0m")
-    print("  ⊕  System Health:     \033[1;32mhttp://localhost:8000/api/v1/system/health\033[0m")
+    if public_ip:
+        print(f"  🌐 \033[1;33mEC2 Public Access:  http://{public_ip}:{port}\033[0m")
+    print(f"  🌐 Web Dashboard:      \033[1;36mhttp://localhost:{port}\033[0m")
+    print(f"  📚 API Documentation:  \033[1;34mhttp://localhost:{port}/docs\033[0m")
+    print(f"  ⊕  System Health:       \033[1;32mhttp://localhost:{port}/api/v1/system/health\033[0m")
     print("\033[96m" + "─" * 60 + "\033[0m")
+    print(f"  * AWS EC2 Tip: Ensure Port {port} (Custom TCP) is OPEN in your Security Group!")
     print("\033[90mPress CTRL+C at any time to stop the server.\033[0m\n")
 
     # Change CWD to backend so static assets and sqlite DB paths resolve correctly
@@ -71,12 +84,18 @@ def start_server():
 
     try:
         import uvicorn
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
+        uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
     except KeyboardInterrupt:
         print("\n\033[93m[*] scanet server terminated gracefully.\033[0m")
 
 if __name__ == "__main__":
+    port = 8000
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        port = int(sys.argv[1])
+    elif "PORT" in os.environ and os.environ["PORT"].isdigit():
+        port = int(os.environ["PORT"])
+
     print_banner()
     check_python()
     setup_environment()
-    start_server()
+    start_server(port)

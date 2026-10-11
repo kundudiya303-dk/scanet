@@ -5,6 +5,37 @@
 
 ---
 
+## ⚡ Quick 60-Second Start: Direct HTTP Access on EC2 (No Domain / No HTTPS Needed)
+
+If you just want to run the single script on your EC2 instance and immediately view the colorful web dashboard over HTTP using your EC2 Public IP:
+
+### 1. In AWS Console: Open Port 8000 in your EC2 Security Group
+- Go to **EC2 Console** $\rightarrow$ **Instances** $\rightarrow$ select your instance $\rightarrow$ **Security** tab $\rightarrow$ click your **Security Group**.
+- Click **Edit inbound rules** $\rightarrow$ **Add rule**:
+  - **Type:** `Custom TCP`
+  - **Port Range:** `8000`
+  - **Source:** `0.0.0.0/0` (or `My IP` for enhanced privacy)
+- Click **Save rules**.
+
+### 2. On your EC2 Terminal: Run the One-Click Script
+```bash
+# Clone the repository
+git clone https://github.com/mjishaan59-cell/scanet.git
+cd scanet
+
+# Run the universal launcher (auto-detects EC2 Public IP and binds to 0.0.0.0:8000)
+./run.sh
+```
+*Tip: To run on a different port like 8080 or 80, simply pass the port number: `./run.sh 8080` or `sudo ./run.sh 80`.*
+
+### 3. Open in your Browser:
+```
+http://<YOUR_EC2_PUBLIC_IP>:8000
+```
+*(The script will automatically detect and print your exact `http://<EC2-PUBLIC-IP>:8000` link in the terminal!)*
+
+---
+
 ## 1. Cloud Architecture & Sizing Recommendation
 
 `scanet` is engineered to operate efficiently with an ultra-lightweight memory footprint ($\le 120\text{ MB}$ idle, $\le 650\text{ MB}$ peak during active scans).

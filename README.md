@@ -14,6 +14,36 @@ Unlike bulky enterprise suites (OpenVAS, Tenable Nessus, full OWASP ZAP) that co
 
 ---
 
+## ⚡ One-Command Instant Launch (Local or AWS EC2)
+
+After cloning the repository, execute **one single command**:
+
+### On Linux / AWS EC2 (Direct HTTP Access):
+```bash
+git clone https://github.com/mjishaan59-cell/scanet.git
+cd scanet
+./run.sh
+```
+> **🌐 AWS EC2 Quick Access (No HTTPS / No Domain Needed):**  
+> 1. In your **AWS EC2 Security Group**, add an Inbound Rule for **Custom TCP Port 8000** (Source: `0.0.0.0/0` or your IP).  
+> 2. Open `http://<YOUR_EC2_PUBLIC_IP>:8000` in your browser.  
+> 3. That's it! The colorful cybersecurity dashboard will load immediately.  
+> *(Optional: To run on a custom port like 8080 or 80, pass the port argument: `./run.sh 8080` or `sudo ./run.sh 80`)*
+
+### On Windows:
+```cmd
+git clone https://github.com/mjishaan59-cell/scanet.git
+cd scanet
+run.bat
+```
+
+### Any System (Python 3.10+):
+```bash
+python run.py
+```
+
+---
+
 ## 🚀 Key Platform Capabilities
 
 - 🔌 **12 Supported Security Tools** — Nmap, Naabu, RustScan, Katana, FFUF, Gobuster, dnsx, Subfinder, HTTPX, Nuclei, MTR, and Passive OSINT.

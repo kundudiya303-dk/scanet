@@ -56,16 +56,25 @@ echo -e "${BLUE}[*] Verifying requirements...${NC}"
 pip install --upgrade pip -q
 pip install -r "$BACKEND_DIR/requirements.txt" -q
 
+# Determine port (default: 8000, or first argument, or $PORT env var)
+PORT="${1:-${PORT:-8000}}"
+
 # Ensure data directory exists
 mkdir -p "$BACKEND_DIR/data"
 
-echo -e "\n${GREEN}[✓] Setup complete! Launching scanet web platform...${NC}"
+# Detect Public IP (AWS EC2 metadata / checkip)
+PUBLIC_IP=$(curl -s -m 2 https://checkip.amazonaws.com 2>/dev/null || curl -s -m 2 https://ifconfig.me 2>/dev/null || echo "")
+
+echo -e "\n${GREEN}[✓] Setup complete! scanet running on port ${PORT}...${NC}"
 echo -e "${CYAN}─────────────────────────────────────────────────────────────${NC}"
-echo -e "  🌐 ${CYAN}Web Dashboard:    ${GREEN}http://localhost:8000${NC}"
-echo -e "  📚 ${CYAN}API Documentation: ${BLUE}http://localhost:8000/docs${NC}"
-echo -e "  ⊕  ${CYAN}System Health:     ${GREEN}http://localhost:8000/api/v1/system/health${NC}"
+if [ -n "$PUBLIC_IP" ]; then
+    echo -e "  🌐 ${CYAN}EC2 Public Access: \033[1;33mhttp://${PUBLIC_IP}:${PORT}${NC}"
+fi
+echo -e "  🌐 ${CYAN}Local Dashboard:   ${GREEN}http://localhost:${PORT}${NC}"
+echo -e "  📚 ${CYAN}API Documentation: ${BLUE}http://localhost:${PORT}/docs${NC}"
 echo -e "${CYAN}─────────────────────────────────────────────────────────────${NC}"
+echo -e "  * AWS EC2 Tip: Ensure Inbound Port ${PORT} (Custom TCP) is OPEN in your Security Group!"
 echo -e "Press CTRL+C at any time to stop the server.\n"
 
 cd "$BACKEND_DIR"
-exec uvicorn main:app --host 0.0.0.0 --port 8000
+exec uvicorn main:app --host 0.0.0.0 --port "$PORT"
