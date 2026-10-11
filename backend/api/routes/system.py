@@ -13,17 +13,22 @@ router = APIRouter()
 TOOL_REGISTRY = [
     {"name": "nmap",      "category": "port_scan",      "tier": 1},
     {"name": "naabu",     "category": "port_scan",      "tier": 1},
+    {"name": "rustscan",  "category": "port_scan",      "tier": 2},
     {"name": "ffuf",      "category": "web_discovery",  "tier": 1},
+    {"name": "gobuster",  "category": "web_discovery",  "tier": 1},
+    {"name": "katana",    "category": "web_discovery",  "tier": 1},
     {"name": "dnsx",      "category": "dns",            "tier": 1},
     {"name": "subfinder", "category": "dns",            "tier": 1},
     {"name": "httpx",     "category": "http",           "tier": 1},
+    {"name": "nuclei",    "category": "assessment",     "tier": 1},
     {"name": "mtr",       "category": "diagnostics",    "tier": 1},
     {"name": "curl",      "category": "http",           "tier": 1},
     {"name": "dig",       "category": "dns",            "tier": 1},
-    {"name": "nuclei",    "category": "assessment",     "tier": 2},
     {"name": "testssl.sh","category": "ssl",            "tier": 2},
     {"name": "whatweb",   "category": "fingerprint",    "tier": 2},
+    {"name": "osint",     "category": "osint_recon",    "tier": 1},
 ]
+
 
 
 @router.get("/tools", summary="Check all tool availability and versions")

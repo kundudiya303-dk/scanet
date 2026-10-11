@@ -49,3 +49,28 @@ This document formalizes critical design and engineering decisions made during t
 - **Context:** Educational platforms deployed on cloud nodes (e.g., AWS EC2) run the risk of unauthorized scanning or SSRF attacks targeting instance metadata (`169.254.169.254`).
 - **Decision:** Programmatically enforce target validation: restrict scans strictly to whitelisted private ranges (RFC 1918) or approved domains; permanently hard-block `169.254.169.254`, `127.0.0.0/8`, and link-local ranges.
 - **Rationale:** Guarantees compliance with cloud provider policies and prevents students or attackers from weaponizing the server against internal infrastructure.
+
+---
+
+### ADR-007: Chained Multi-Tool Reconnaissance Pipelines (Playbooks)
+- **Status:** Accepted
+- **Context:** Individual manual tool executions are inefficient for holistic attack surface discovery. Students and security analysts require reproducible end-to-end workflows (e.g., Subdomain Discovery -> DNS Resolution -> Port Scanning -> HTTP Inspection -> Vulnerability Auditing).
+- **Decision:** Implement sequential multi-stage pipeline orchestration (`PipelineManager`) that automatically feeds outputs of discovery tools into downstream analyzers.
+- **Rationale:** Mimics modern attack surface frameworks (reNgine, reconFTW) while maintaining process-group safety, deterministic timeouts, and granular stage progress tracking.
+
+---
+
+### ADR-008: AI Security Advisory & Heuristic Rule Expert System
+- **Status:** Accepted
+- **Context:** Raw tool outputs (e.g., port numbers, raw HTTP headers) are overwhelming for students and lack contextualized risk explanations. However, requiring mandatory third-party LLM API keys (OpenAI/Anthropic) breaks self-contained offline lab deployments.
+- **Decision:** Build a zero-dependency offline **Heuristic Expert Advisory Engine** (`AISecurityAdvisor`) that maps open ports and misconfigurations to **MITRE ATT&CK TTPs**, CVSS scores, and educational remediation playbooks, while providing a pluggable hook for local offline models (Ollama).
+- **Rationale:** Guarantees 100% functionality in offline university intranet environments with zero token costs and zero latency, while still providing high-impact intelligent guidance.
+
+---
+
+### ADR-009: OASIS SARIF v2.1.0 Standard Compliance for DevSecOps
+- **Status:** Accepted
+- **Context:** University capstone projects and modern security platforms must integrate seamlessly with enterprise CI/CD pipelines and security dashboards (GitHub Security, GitLab, DefectDojo).
+- **Decision:** Implement native OASIS SARIF v2.1.0 generation in `backend/analyzers/sarif_exporter.py` alongside standard JSON, HTML, PDF, and CSV exports.
+- **Rationale:** Enables direct automated upload of scanet findings into GitHub Code Scanning Alerts and modern DevSecOps vulnerability management systems.
+

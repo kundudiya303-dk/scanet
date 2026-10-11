@@ -3,7 +3,11 @@ scanet — Nmap Tool Adapter
 Unprivileged TCP Connect scan (-sT) with XML output parsed via defusedxml.
 Tier 1 Core — Network Port & Service Discovery.
 """
-import defusedxml.ElementTree as ET
+try:
+    import defusedxml.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+
 from adapters.base import BaseToolAdapter, AdapterMeta, ToolResult
 from typing import List
 

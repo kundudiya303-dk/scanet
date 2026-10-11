@@ -8,15 +8,22 @@ import { renderTargets }   from './pages/targets.js';
 import { renderJobs }      from './pages/jobs.js';
 import { renderResults }   from './pages/results.js';
 import { renderSystem }    from './pages/system.js';
+import { renderPipelines } from './pages/pipelines.js';
+import { renderTopology }  from './pages/topology.js';
+import { renderAdvisor }   from './pages/advisor.js';
 
 const ROUTES = {
-    ''           : { title: 'Dashboard',        render: renderDashboard },
-    'dashboard'  : { title: 'Dashboard',        render: renderDashboard },
-    'targets'    : { title: 'Target Manager',   render: renderTargets   },
-    'jobs'       : { title: 'Live Job Center',  render: renderJobs      },
-    'results'    : { title: 'Results Explorer', render: renderResults    },
-    'system'     : { title: 'System Health',    render: renderSystem     },
+    ''           : { title: 'Dashboard',             render: renderDashboard },
+    'dashboard'  : { title: 'Dashboard',             render: renderDashboard },
+    'targets'    : { title: 'Target Manager',        render: renderTargets   },
+    'pipelines'  : { title: 'Recon Pipelines',       render: renderPipelines },
+    'jobs'       : { title: 'Live Job Center',       render: renderJobs      },
+    'topology'   : { title: 'Attack Surface Graph',  render: renderTopology  },
+    'results'    : { title: 'Results Explorer',      render: renderResults   },
+    'advisor'    : { title: 'AI Security Advisor',   render: renderAdvisor   },
+    'system'     : { title: 'System Health',         render: renderSystem    },
 };
+
 
 export const router = {
     _container: null,

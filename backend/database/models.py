@@ -132,3 +132,46 @@ class AuditLog(Base):
     details       = Column(Text, nullable=True)           # JSON
     ip_address    = Column(String(64), nullable=False)
     timestamp     = Column(DateTime, server_default=func.now())
+
+
+# ── Continuous Monitoring & Scan Schedules ───────────────────────────────────
+class ScanSchedule(Base):
+    __tablename__ = "scan_schedules"
+
+    id           = Column(String, primary_key=True, default=new_uuid)
+    target_id    = Column(String, ForeignKey("targets.id", ondelete="CASCADE"))
+    cron_expr    = Column(String(64), nullable=False)    # e.g. "0 0 * * *" (daily)
+    pipeline_id  = Column(String(64), nullable=False)    # 'full_recon', 'web_security'
+    is_active    = Column(Boolean, default=True)
+    last_run_at  = Column(DateTime, nullable=True)
+    created_at   = Column(DateTime, server_default=func.now())
+
+
+# ── Webhook Alert Channels ───────────────────────────────────────────────────
+class WebhookConfig(Base):
+    __tablename__ = "webhook_configs"
+
+    id           = Column(String, primary_key=True, default=new_uuid)
+    name         = Column(String(128), nullable=False)
+    channel_type = Column(String(32), nullable=False)    # 'discord', 'slack', 'generic'
+    webhook_url  = Column(String(1024), nullable=False)
+    notify_on_drift = Column(Boolean, default=True)
+    notify_on_critical = Column(Boolean, default=True)
+    is_active    = Column(Boolean, default=True)
+    created_at   = Column(DateTime, server_default=func.now())
+
+
+# ── Chained Pipeline Runs ────────────────────────────────────────────────────
+class ScanPipelineRun(Base):
+    __tablename__ = "pipeline_runs"
+
+    id           = Column(String, primary_key=True, default=new_uuid)
+    target_id    = Column(String, ForeignKey("targets.id", ondelete="CASCADE"))
+    pipeline_id  = Column(String(64), nullable=False)
+    status       = Column(String(32), nullable=False, default="running")
+    stages_total = Column(Integer, default=1)
+    stages_done  = Column(Integer, default=0)
+    current_stage= Column(String(64), nullable=True)
+    started_at   = Column(DateTime, server_default=func.now())
+    completed_at = Column(DateTime, nullable=True)
+

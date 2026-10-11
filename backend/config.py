@@ -2,11 +2,19 @@
 scanet — Application Configuration
 Loads settings from environment variables with sensible defaults.
 """
-from pydantic_settings import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    class BaseSettings:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8000
@@ -28,6 +36,8 @@ class Settings(BaseSettings):
 
     # Wordlists
     WORDLIST_DIR: str = "../wordlists"
+    WORDLISTS_DIR: str = "../wordlists"
+
 
     # Scope — block these from being scanned under any circumstances
     BLOCKED_CIDRS: List[str] = [

@@ -5,7 +5,14 @@ Tests that blocked ranges are correctly rejected and valid targets pass.
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../backend"))
 
-import pytest
+try:
+    import pytest
+except ImportError:
+    class _PytestMock:
+        def fixture(self, f):
+            return f
+    pytest = _PytestMock()
+
 from engine.scope_validator import ScopeValidator
 
 
@@ -14,25 +21,35 @@ def validator():
     return ScopeValidator(approved_targets=["192.168.1.10", "10.0.0.5"])
 
 
-def test_loopback_is_blocked(validator):
+def test_loopback_is_blocked(validator=None):
+    if validator is None:
+        validator = ScopeValidator(approved_targets=["192.168.1.10", "10.0.0.5"])
     result = validator.validate_target("127.0.0.1")
     assert result["valid"] is False
     assert "blocked" in result["reason"].lower()
 
 
-def test_aws_imds_is_blocked(validator):
+
+def test_aws_imds_is_blocked(validator=None):
+    if validator is None:
+        validator = ScopeValidator(approved_targets=["192.168.1.10", "10.0.0.5"])
     result = validator.validate_target("169.254.169.254")
     assert result["valid"] is False
 
 
-def test_approved_target_passes(validator):
+def test_approved_target_passes(validator=None):
+    if validator is None:
+        validator = ScopeValidator(approved_targets=["192.168.1.10", "10.0.0.5"])
     result = validator.validate_target("192.168.1.10")
     assert result["valid"] is True
 
 
-def test_non_whitelisted_target_blocked(validator):
+def test_non_whitelisted_target_blocked(validator=None):
+    if validator is None:
+        validator = ScopeValidator(approved_targets=["192.168.1.10", "10.0.0.5"])
     result = validator.validate_target("192.168.1.99")
     assert result["valid"] is False
+
     assert "whitelist" in result["reason"].lower()
 
 

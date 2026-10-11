@@ -9,6 +9,11 @@ from adapters.dnsx_adapter      import DnsxAdapter
 from adapters.subfinder_adapter import SubfinderAdapter
 from adapters.httpx_adapter     import HttpxAdapter
 from adapters.mtr_adapter       import MtrAdapter
+from adapters.katana_adapter    import KatanaAdapter
+from adapters.nuclei_adapter    import NucleiAdapter
+from adapters.gobuster_adapter  import GobusterAdapter
+from adapters.rustscan_adapter  import RustScanAdapter
+from adapters.osint_adapter     import OsintAdapter
 
 TOOL_ADAPTERS = {
     "nmap":      NmapAdapter(),
@@ -18,7 +23,13 @@ TOOL_ADAPTERS = {
     "subfinder": SubfinderAdapter(),
     "httpx":     HttpxAdapter(),
     "mtr":       MtrAdapter(),
+    "katana":    KatanaAdapter(),
+    "nuclei":    NucleiAdapter(),
+    "gobuster":  GobusterAdapter(),
+    "rustscan":  RustScanAdapter(),
+    "osint":     OsintAdapter(),
 }
+
 
 
 def get_adapter(tool_name: str):
@@ -36,3 +47,14 @@ def list_all_adapters() -> list[dict]:
         }
         for adapter in TOOL_ADAPTERS.values()
     ]
+
+
+class ToolRegistry:
+    @staticmethod
+    def get(tool_name: str):
+        return get_adapter(tool_name)
+
+    @staticmethod
+    def list_all():
+        return list_all_adapters()
+

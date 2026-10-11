@@ -13,24 +13,45 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **1** | `1578508` | 2026-10-11 19:05:07 | `.gitignore`<br>`SCANET_MASTER_BLUEPRINT.md` | Initial commit: scanet research and architecture blueprint | **SUCCESS (Pushed)** |
 | **2** | `382e755` | 2026-10-11 19:08:15 | `records/PROJECT_STEPS_LOG.md`<br>`records/GITHUB_UPLOAD_TRACKER.md` | Add step execution log and GitHub upload tracker | **SUCCESS (Pushed)** |
 | **3** | `f594ed2` | 2026-10-11 19:10:25 | `records/README.md`<br>`records/ARCHITECTURE_DECISIONS.md`<br>`records/TOOL_INTEGRATION_STATUS.md`<br>`records/PROJECT_STEPS_LOG.md`<br>`records/GITHUB_UPLOAD_TRACKER.md` | Add ADR records, tool status matrix, and records index | **SUCCESS (Pushed)** |
+| **4** | `1ea130d` | 2026-10-11 19:23:20 | 53 files across `backend/`, `frontend/`, `docker/`, `scripts/`, `tests/`, `wordlists/`, `README.md`, `LICENSE` | Phase 1: Complete professional project folder structure | **SUCCESS (Pushed)** |
+| **5** | *Pending* | 2026-10-11 19:46:00 | 25 files across `backend/adapters/`, `backend/analyzers/`, `backend/engine/`, `backend/api/routes/`, `frontend/`, `tests/`, and `records/` | Phase 2: Deep research, 12 tools universe, AI advisor, pipelines, topology graph, SARIF, and 14 tests | **In Progress (Staged)** |
 
 ---
 
 ## 2. Tracked Files Inventory on GitHub
 
-The following files are currently version-controlled and synchronized with the remote GitHub repository:
+The following components are version-controlled and synchronized with the remote GitHub repository:
 
-- `/.gitignore` — Git exclusion rules for clean repository hygiene.
-- `/SCANET_MASTER_BLUEPRINT.md` — Complete master architecture, research comparison, and system specification.
-- `/records/` — Dedicated audit and tracking directory.
-  - `/records/README.md` — Directory index and navigation guide.
-  - `/records/PROJECT_STEPS_LOG.md` — Step-by-step record of all project actions and milestones.
-  - `/records/GITHUB_UPLOAD_TRACKER.md` — Complete manifest of GitHub commits, files uploaded, and sync statuses.
-  - `/records/ARCHITECTURE_DECISIONS.md` — Architecture Decision Records (ADRs 001–006).
-  - `/records/TOOL_INTEGRATION_STATUS.md` — Tool implementation and adapter status matrix.
+- `/.gitignore` — Clean repository exclusion rules.
+- `/LICENSE` — MIT open-source license.
+- `/README.md` — Professional project documentation and overview.
+- `/SCANET_MASTER_BLUEPRINT.md` — Master system architecture and engineering blueprint.
+- `/records/` — Governance and tracking repository:
+  - `README.md` — Records index and navigation guide.
+  - `PROJECT_STEPS_LOG.md` — Step-by-step chronological action log.
+  - `GITHUB_UPLOAD_TRACKER.md` — Manifest of commits, uploaded files, and push statuses.
+  - `ARCHITECTURE_DECISIONS.md` — ADRs 001 through 009.
+  - `TOOL_INTEGRATION_STATUS.md` — Matrix of 22 tools, adapters, analyzers, and playbooks.
+  - `DEEP_RESEARCH_AND_FEATURE_EXPANSION.md` — Exhaustive tool taxonomy & high-impact feature blueprint.
+- `/backend/` — FastAPI core:
+  - `config.py`, `main.py`, `requirements.txt`
+  - `database/`: `connection.py`, `models.py` (ORM models including Schedules, Webhooks, Pipelines)
+  - `adapters/`: `base.py`, `nmap_adapter.py`, `naabu_adapter.py`, `ffuf_adapter.py`, `dnsx_adapter.py`, `subfinder_adapter.py`, `httpx_adapter.py`, `mtr_adapter.py`, `katana_adapter.py`, `nuclei_adapter.py`, `gobuster_adapter.py`, `rustscan_adapter.py`, `osint_adapter.py`
+  - `engine/`: `job_manager.py`, `scope_validator.py`, `tool_registry.py`, `pipeline_manager.py`
+  - `analyzers/`: `headers.py`, `ssl_cert.py`, `subnet.py`, `diff.py`, `cve_correlator.py`, `ai_advisor.py`, `compliance.py`, `sarif_exporter.py`, `webhook_notifier.py`
+  - `api/routes/`: `targets.py`, `jobs.py`, `results.py`, `system.py`, `pipelines.py`, `advisor.py`, `topology.py`
+- `/frontend/` — Single-page dashboard:
+  - `index.html`, `assets/css/main.css`
+  - `assets/js/`: `app.js`, `api.js`, `router.js`
+  - `assets/js/components/`: `nav.js`
+  - `assets/js/pages/`: `dashboard.js`, `targets.js`, `jobs.js`, `results.js`, `system.js`, `pipelines.js`, `topology.js`, `advisor.js`
+- `/tests/` — Verified unit test suites (14/14 tests passing).
+- `/docker/` — `Dockerfile`, `docker-compose.yml`.
+- `/scripts/` — `install.sh`, `health_check.sh`.
+- `/wordlists/` — `README.txt`.
 
 ---
 
 ## 3. Automation Policy
-- Every change or file creation inside the `scanet` workspace will automatically update `PROJECT_STEPS_LOG.md` and `GITHUB_UPLOAD_TRACKER.md`.
-- Changes will be immediately staged, committed with a descriptive message, and pushed to `origin/main`.
+- Every change in the `scanet` workspace is logged in `PROJECT_STEPS_LOG.md` and `GITHUB_UPLOAD_TRACKER.md`.
+- Changes are staged, committed with descriptive semantic messages, and immediately pushed to `origin/main`.

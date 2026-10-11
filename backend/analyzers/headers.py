@@ -3,7 +3,11 @@ scanet — HTTP Security Header Analyzer
 Inspects HTTP response headers and grades security posture A+ to F.
 Zero external tool dependency — uses Python httpx directly.
 """
-import httpx
+try:
+    import httpx
+except ImportError:
+    httpx = None
+
 from typing import Optional
 
 
