@@ -8,7 +8,9 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from database.connection import get_db
-from database.models import ScanJob, Target, Host, Port, new_uuid
+from database.models import ScanJob, Target, Host, Port, Finding, new_uuid
+from analyzers.cve_correlator import correlate_service_cves
+from analyzers.ai_advisor import PORT_RISK_KNOWLEDGE
 from engine.job_manager import job_manager
 from engine.scope_validator import ScopeValidator
 from engine.tool_registry import get_adapter
@@ -151,16 +153,53 @@ async def _run_job_background(
                     )
                     db.add(host)
                     for p in h.get("ports", []):
+                        port_num = int(p.get("port", 0))
+                        svc_name = p.get("service", "")
+                        prod = p.get("product", "")
+                        ver = p.get("version", "")
+
                         db.add(Port(
                             id=new_uuid(),
                             host_id=host_id,
-                            port_number=p.get("port", 0),
+                            port_number=port_num,
                             protocol=p.get("protocol", "tcp"),
                             state=p.get("state", "open"),
-                            service_name=p.get("service", ""),
-                            product=p.get("product", ""),
-                            version=p.get("version", ""),
+                            service_name=svc_name,
+                            product=prod,
+                            version=ver,
                         ))
+
+                        # Correlate software version against CVE knowledge base
+                        matched_cves = correlate_service_cves(prod or svc_name, ver)
+                        for cve in matched_cves:
+                            sev = str(cve.get("severity", "high")).lower().split()[0]
+                            db.add(Finding(
+                                id=new_uuid(),
+                                job_id=job_id,
+                                target_id=target_id,
+                                category="cve_vulnerability",
+                                severity=sev if sev in ["critical", "high", "medium", "low", "info"] else "high",
+                                title=f"{cve.get('cve_id')}: {cve.get('name')}",
+                                description=f"Identified {cve.get('name')} on port {port_num} ({svc_name}). CVSS score: {cve.get('cvss')}.",
+                                evidence=f"Matched version '{ver}' against {cve.get('cve_id')} bounds ({cve.get('min_version')} - {cve.get('max_version')}).",
+                                remediation=cve.get("remediation", "")
+                            ))
+
+                        # Correlate port exposure risk (e.g. FTP, Telnet, SMB, Redis, RDP)
+                        if port_num in PORT_RISK_KNOWLEDGE:
+                            rk = PORT_RISK_KNOWLEDGE[port_num]
+                            sev = str(rk.get("risk_level", "medium")).lower()
+                            db.add(Finding(
+                                id=new_uuid(),
+                                job_id=job_id,
+                                target_id=target_id,
+                                category="port_exposure",
+                                severity=sev if sev in ["critical", "high", "medium", "low", "info"] else "medium",
+                                title=rk.get("title", f"Exposed Port {port_num}"),
+                                description=rk.get("explanation", ""),
+                                evidence=f"Exposed {p.get('protocol', 'tcp')}/{port_num} ({svc_name})",
+                                remediation=rk.get("remediation", "")
+                            ))
 
             await db.commit()
 

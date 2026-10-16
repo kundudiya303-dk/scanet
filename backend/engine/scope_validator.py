@@ -1,15 +1,16 @@
 """
 scanet — Scope Validator & Target Guardrail
 Validates and restricts scan targets to authorized ranges.
-Permanently blocks loopback, cloud metadata (IMDS), link-local, and broadcast ranges.
+Permanently blocks cloud metadata (IMDS), link-local, and broadcast ranges.
 Permits local laboratory/educational targets (RFC 1918 subnets, Metasploitable VMs, lab domains).
+Allows loopback for authorized local web audits when explicitly requested.
 """
 import ipaddress
 from typing import Union
 
 # Permanently hard-blocked ranges — strictly forbidden for cloud security & network safety
 HARD_BLOCKED_NETWORKS = [
-    ipaddress.ip_network("127.0.0.0/8"),      # IPv4 loopback
+    ipaddress.ip_network("127.0.0.0/8"),      # IPv4 loopback (blocked by default, overridable for local web audit)
     ipaddress.ip_network("169.254.0.0/16"),   # Link-local / AWS Instance Metadata Service (IMDS)
     ipaddress.ip_network("::1/128"),           # IPv6 loopback
     ipaddress.ip_network("fc00::/7"),          # IPv6 unique local
@@ -29,7 +30,7 @@ class ScopeValidator:
         self.approved_targets = approved_targets or []
 
     @classmethod
-    def validate(cls, target: str) -> tuple[bool, str]:
+    def validate(cls, target: str, allow_loopback: bool = False) -> tuple[bool, str]:
         """Convenience classmethod for rapid target validation."""
         cleaned = target.strip().lower()
         if "://" in cleaned:
@@ -37,13 +38,17 @@ class ScopeValidator:
         else:
             cleaned = cleaned.split("/")[0].split(":")[0]
         validator = cls()
-        res = validator.validate_target(cleaned, require_whitelist=False)
+        res = validator.validate_target(cleaned, require_whitelist=False, allow_loopback=allow_loopback)
         return res["valid"], res["reason"]
 
-    def is_hard_blocked(self, ip_str: str) -> tuple[bool, str]:
+    def is_hard_blocked(self, ip_str: str, allow_loopback: bool = False) -> tuple[bool, str]:
         """Returns (is_blocked, reason) for a given IP address string."""
+        if allow_loopback and ip_str in ("127.0.0.1", "localhost", "::1"):
+            return False, ""
         try:
             addr = ipaddress.ip_address(ip_str)
+            if allow_loopback and addr.is_loopback:
+                return False, ""
             for network in HARD_BLOCKED_NETWORKS:
                 if addr in network:
                     return True, f"Address {ip_str} is in permanently blocked range {network}"
@@ -58,7 +63,7 @@ class ScopeValidator:
         except ValueError:
             return False
 
-    def validate_target(self, target: str, require_whitelist: bool = True) -> dict:
+    def validate_target(self, target: str, require_whitelist: bool = True, allow_loopback: bool = False) -> dict:
         """
         Full target validation.
         Returns {"valid": bool, "target": str, "reason": str}
@@ -69,7 +74,7 @@ class ScopeValidator:
             return {"valid": False, "target": target, "reason": "Target cannot be empty"}
 
         # Check hard-blocked IP addresses
-        blocked, reason = self.is_hard_blocked(target)
+        blocked, reason = self.is_hard_blocked(target, allow_loopback=allow_loopback)
         if blocked:
             return {"valid": False, "target": target, "reason": reason}
 

@@ -42,9 +42,11 @@ async def execute_pipeline(preset_id: str, payload: dict, db: AsyncSession = Dep
     if preset_id not in PIPELINE_PRESETS:
         raise HTTPException(status_code=404, detail="Unknown pipeline preset")
     
-    target_id = payload.get("target_id")
-    if not target_id:
-        raise HTTPException(status_code=400, detail="target_id is required")
+    from database.models import Target
+    target_res = await db.execute(select(Target).where(Target.id == target_id))
+    target = target_res.scalar_one_or_none()
+    if not target:
+        raise HTTPException(status_code=404, detail="Target not found in database")
 
     preset = PIPELINE_PRESETS[preset_id]
     return {

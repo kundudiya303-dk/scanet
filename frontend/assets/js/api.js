@@ -56,10 +56,11 @@ export const api = {
     getMitreKnowledge: ()    => request('/advisor/mitre-knowledge'),
 
     // Pipelines
-    getPipelines: ()         => request('/pipelines'),
+    getPipelines:    ()               => request('/pipelines/presets'),
+    executePipeline: (presetId, data) => request(`/pipelines/execute/${presetId}`, { method: 'POST', body: JSON.stringify(data) }),
 
     // Topology
-    getTopology:  (jobId)    => request(`/topology${jobId ? '?job_id=' + jobId : ''}`),
+    getTopology:     (targetId)       => request(`/topology/graph${targetId ? '/' + targetId : ''}`),
 
     // Web Security Auditor
     scanWebSecurity:   (url)           => request('/web-audit/scan', { method: 'POST', body: JSON.stringify({ target_url: url }) }),

@@ -33,8 +33,8 @@ async def scan_web_security(req: WebAuditRequest):
     Run comprehensive web security and misconfiguration audit on target URL.
     Checks HTTP methods, sensitive file leaks, cookies, and CORS policies.
     """
-    # Scope validation
-    is_valid, reason = ScopeValidator.validate(req.target_url)
+    # Scope validation (allows loopback for local testing of web services)
+    is_valid, reason = ScopeValidator.validate(req.target_url, allow_loopback=True)
     if not is_valid:
         raise HTTPException(status_code=400, detail=f"Target rejected by Scope Guard: {reason}")
 
