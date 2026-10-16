@@ -143,6 +143,35 @@ async function loadTargetDropdown() {
         sel.innerHTML = targets.map(t =>
             `<option value="${escapeHtml(t.id)}" data-value="${escapeHtml(t.value)}">${escapeHtml(t.name)} (${escapeHtml(t.value)})</option>`
         ).join('');
+
+        // Handle preselected target from lab presets or navigation
+        const preselectedVal = sessionStorage.getItem('scanet_preselected_target');
+        const preselectedTool = sessionStorage.getItem('scanet_preselected_tool');
+
+        if (preselectedVal) {
+            for (let i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].getAttribute('data-value') === preselectedVal || sel.options[i].value === preselectedVal) {
+                    sel.selectedIndex = i;
+                    break;
+                }
+            }
+            sessionStorage.removeItem('scanet_preselected_target');
+            const errEl = document.getElementById('job-launch-error');
+            if (errEl) {
+                errEl.style.display = 'block';
+                errEl.style.color = '#34d399';
+                errEl.style.background = 'rgba(52,211,153,0.1)';
+                errEl.style.border = '1px solid rgba(52,211,153,0.3)';
+                errEl.textContent = `✓ Lab preset target loaded: "${preselectedVal}". Ready to launch!`;
+            }
+        }
+
+        if (preselectedTool) {
+            const toolSel = document.getElementById('job-tool-select');
+            if (toolSel) toolSel.value = preselectedTool;
+            sessionStorage.removeItem('scanet_preselected_tool');
+        }
+
         updateCmdPreview();
     } catch {
         sel.innerHTML = '<option value="">Failed to load targets. Is the backend running?</option>';

@@ -1,23 +1,27 @@
 """
 scanet — Process Job Manager
-Async subprocess execution with process-group isolation and SSE streaming.
+Async subprocess execution with cross-platform process management and SSE streaming.
+Handles Windows (no os.setsid / os.killpg) and Linux/macOS gracefully.
 Zero orphaned processes. Zero blocking calls.
 """
 import asyncio
 import os
+import sys
 import signal
 import typing
 import logging
 
 logger = logging.getLogger("scanet.job_manager")
 
+IS_WINDOWS = sys.platform == "win32"
+
 
 class ProcessJobManager:
     """
     Manages the full lifecycle of external tool processes:
-    - Spawn with isolated process group (os.setsid)
+    - Spawn with isolated process group (Linux: os.setsid / Windows: CREATE_NEW_PROCESS_GROUP)
     - Stream stdout/stderr line-by-line to output callback
-    - Cancel entire process group on request
+    - Cancel process on request (cross-platform)
     - Enforce execution timeouts
     """
 
@@ -32,18 +36,27 @@ class ProcessJobManager:
         timeout_seconds: int = 600,
     ) -> tuple[int, str]:
         """
-        Executes a command in an isolated process group.
+        Executes a command as an isolated subprocess.
         Streams each output line through output_callback.
         Returns (exit_code, full_output_string).
         """
         logger.info("Starting job %s: %s", job_id, " ".join(cmd_args))
 
-        proc = await asyncio.create_subprocess_exec(
-            *cmd_args,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,
-            preexec_fn=os.setsid,  # New session = independent process group
-        )
+        kwargs: dict = {
+            "stdout": asyncio.subprocess.PIPE,
+            "stderr": asyncio.subprocess.STDOUT,
+        }
+
+        # Cross-platform process group isolation
+        if IS_WINDOWS:
+            # Windows: CREATE_NEW_PROCESS_GROUP allows sending CTRL_BREAK_EVENT
+            import subprocess
+            kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+        else:
+            # Linux/macOS: new session = independent process group
+            kwargs["preexec_fn"] = os.setsid
+
+        proc = await asyncio.create_subprocess_exec(*cmd_args, **kwargs)
         self.active_processes[job_id] = proc
         output_lines: list[str] = []
 
@@ -77,26 +90,42 @@ class ProcessJobManager:
 
     async def cancel_job(self, job_id: str) -> bool:
         """
-        Terminates the entire process group of a running job.
-        Sends SIGTERM, then SIGKILL after 1 second if still alive.
+        Terminates a running job process (cross-platform).
+        Linux/macOS: kills entire process group via SIGTERM -> SIGKILL.
+        Windows: terminates process via proc.terminate() / proc.kill().
         """
         proc = self.active_processes.get(job_id)
         if not proc or proc.returncode is not None:
             return False
 
         try:
-            pgid = os.getpgid(proc.pid)
-            logger.info("Sending SIGTERM to process group %d for job %s", pgid, job_id)
-            os.killpg(pgid, signal.SIGTERM)
-            await asyncio.sleep(1.0)
-            if proc.returncode is None:
-                logger.warning("Escalating to SIGKILL for job %s", job_id)
-                os.killpg(pgid, signal.SIGKILL)
+            if IS_WINDOWS:
+                # Windows: send CTRL_BREAK_EVENT then kill
+                import subprocess
+                proc.send_signal(signal.CTRL_BREAK_EVENT)
+                await asyncio.sleep(1.0)
+                if proc.returncode is None:
+                    proc.kill()
+            else:
+                # Linux/macOS: kill entire process group
+                pgid = os.getpgid(proc.pid)
+                logger.info("Sending SIGTERM to process group %d for job %s", pgid, job_id)
+                os.killpg(pgid, signal.SIGTERM)
+                await asyncio.sleep(1.0)
+                if proc.returncode is None:
+                    logger.warning("Escalating to SIGKILL for job %s", job_id)
+                    os.killpg(pgid, signal.SIGKILL)
             return True
+
         except ProcessLookupError:
             return True
         except Exception as exc:
             logger.error("Error cancelling job %s: %s", job_id, exc)
+            # Last resort: try terminate/kill directly on the process object
+            try:
+                proc.terminate()
+            except Exception:
+                pass
             return False
 
     def list_active_jobs(self) -> list[str]:

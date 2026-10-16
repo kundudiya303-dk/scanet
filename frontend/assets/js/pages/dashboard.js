@@ -3,6 +3,18 @@
  */
 import { api } from '../api.js';
 
+// Pre-configured University Lab Target Loader
+window.loadLabPreset = async function(name, value, type, tool = 'nmap') {
+    try {
+        await api.createTarget({ name, value, target_type: type, created_by: 'lab_preset' });
+    } catch (e) {
+        // Target may already be registered — safe to continue
+    }
+    sessionStorage.setItem('scanet_preselected_target', value);
+    sessionStorage.setItem('scanet_preselected_tool', tool);
+    window.location.hash = '#/jobs';
+};
+
 export async function renderDashboard(container) {
     container.innerHTML = `
         <!-- Welcome Hero Banner with Brand Logo -->
@@ -207,21 +219,26 @@ export async function renderDashboard(container) {
                         <span>Pre-Configured University Lab Presets</span>
                         <span class="badge badge-indigo">Educational Mode</span>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                         <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-cyan);">
                             <div style="font-weight: 700; margin-bottom: 0.2rem;">Metasploitable 2</div>
                             <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Target: 192.168.1.100 (Linux)</div>
-                            <button class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" onclick="alert('Loaded Metasploitable 2 lab preset into Scan Launcher!')">Load Profile</button>
+                            <button class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" onclick="window.loadLabPreset('Metasploitable 2', '192.168.1.100', 'ip', 'nmap')">Load &amp; Launch</button>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-emerald);">
                             <div style="font-weight: 700; margin-bottom: 0.2rem;">OWASP Juice Shop</div>
-                            <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Target: juiceshop.lab:3000</div>
-                            <button class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" onclick="alert('Loaded OWASP Juice Shop web recon preset!')">Load Profile</button>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Target: juiceshop.lab (Web)</div>
+                            <button class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" onclick="window.loadLabPreset('OWASP Juice Shop', 'juiceshop.lab', 'domain', 'httpx')">Load &amp; Launch</button>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-purple);">
+                            <div style="font-weight: 700; margin-bottom: 0.2rem;">Metasploitable 3</div>
+                            <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Target: 192.168.56.101 (Host-only)</div>
+                            <button class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" onclick="window.loadLabPreset('Metasploitable 3', '192.168.56.101', 'ip', 'nmap')">Load &amp; Launch</button>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--color-amber);">
                             <div style="font-weight: 700; margin-bottom: 0.2rem;">Local Lab RFC1918</div>
                             <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Target: 10.0.0.0/24 (Subnet)</div>
-                            <button class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" onclick="alert('Loaded RFC1918 Subnet discovery preset!')">Load Profile</button>
+                            <button class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.65rem;" onclick="window.loadLabPreset('RFC1918 Lab Subnet', '10.0.0.0/24', 'cidr', 'nmap')">Load &amp; Launch</button>
                         </div>
                     </div>
                 </div>

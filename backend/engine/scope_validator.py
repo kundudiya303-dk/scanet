@@ -1,16 +1,16 @@
 """
 scanet — Scope Validator & Target Guardrail
 Validates and restricts scan targets to authorized ranges.
-Permanently blocks loopback, cloud metadata, link-local, and private ranges
-unless explicitly whitelisted by an administrator.
+Permanently blocks loopback, cloud metadata (IMDS), link-local, and broadcast ranges.
+Permits local laboratory/educational targets (RFC 1918 subnets, Metasploitable VMs, lab domains).
 """
 import ipaddress
 from typing import Union
 
-# Permanently hard-blocked ranges — never scannable under any configuration
+# Permanently hard-blocked ranges — strictly forbidden for cloud security & network safety
 HARD_BLOCKED_NETWORKS = [
     ipaddress.ip_network("127.0.0.0/8"),      # IPv4 loopback
-    ipaddress.ip_network("169.254.0.0/16"),   # Link-local / AWS Instance Metadata Service
+    ipaddress.ip_network("169.254.0.0/16"),   # Link-local / AWS Instance Metadata Service (IMDS)
     ipaddress.ip_network("::1/128"),           # IPv6 loopback
     ipaddress.ip_network("fc00::/7"),          # IPv6 unique local
     ipaddress.ip_network("fe80::/10"),         # IPv6 link-local
@@ -31,7 +31,6 @@ class ScopeValidator:
     @classmethod
     def validate(cls, target: str) -> tuple[bool, str]:
         """Convenience classmethod for rapid target validation."""
-        # Strip scheme or paths if passed as URL
         cleaned = target.strip().lower()
         if "://" in cleaned:
             cleaned = cleaned.split("://")[1].split("/")[0].split(":")[0]
@@ -50,7 +49,7 @@ class ScopeValidator:
                     return True, f"Address {ip_str} is in permanently blocked range {network}"
             return False, ""
         except ValueError:
-            return False, ""  # Not a plain IP — let hostname validation handle it
+            return False, ""  # Hostname (e.g. juiceshop.lab, metasploitable.local)
 
     def is_private_ip(self, ip_str: str) -> bool:
         """Returns True if the IP is in an RFC 1918 private range."""
