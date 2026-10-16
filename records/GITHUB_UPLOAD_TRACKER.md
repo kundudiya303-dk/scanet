@@ -26,6 +26,9 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **15** | `b8546c5` | 2026-10-11 21:00:10 | `frontend/assets/images/`, `frontend/assets/js/components/nav.js`, `frontend/assets/js/pages/dashboard.js`, `frontend/assets/css/main.css`, `frontend/index.html`, `backend/main.py`, `records/` | Phase 12: Unique brand logo identity & dashboard visual integration | **SUCCESS (Pushed)** |
 | **16** | `0c3e95e` | 2026-10-11 21:12:46 | `backend/analyzers/web_auditor.py`, `backend/analyzers/subdomain_takeover.py`, `backend/api/routes/web_audit.py`, `frontend/assets/js/pages/webaudit.js`, `frontend/assets/js/router.js`, `frontend/assets/js/components/nav.js`, `tests/`, `records/` | Phase 13: Integrated Nikto/ZAP Web Security Auditor & Subdomain Takeover Engine (32 unit tests passing) | **SUCCESS (Pushed)** |
 | **17** | `b7c6741` | 2026-10-11 21:20:01 | `docs/DASHBOARD_USER_GUIDE.md`, `README.md`, `records/` | Phase 14: Comprehensive dashboard operator manual & README cross-linking | **SUCCESS (Pushed)** |
+| **18** | `47e2510` | 2026-10-16 11:45:00 | `backend/`, `frontend/`, `tests/` | Phase 15: Replaced all stubs with real DB-backed scan, scope validation, and results implementation | **SUCCESS (Pushed)** |
+| **19** | `2529451` | 2026-10-16 12:15:39 | `backend/adapters/nmap_adapter.py`, `backend/engine/job_manager.py`, `backend/engine/scope_validator.py`, `backend/engine/builtin_scanner.py`, `frontend/` | Phase 16: Real lab preset registration, Windows process management, and native async socket fallback engine | **SUCCESS (Pushed)** |
+| **20** | `5c9bf70` | 2026-10-16 12:42:46 | `backend/api/routes/`, `frontend/assets/js/pages/`, `backend/engine/` | Phase 17: Wired real backend telemetry to Web Audit, Results Explorer, Attack Surface Graph, Recon Pipelines, and AI Security Advisor | **SUCCESS (Pushed)** |
 
 ---
 
