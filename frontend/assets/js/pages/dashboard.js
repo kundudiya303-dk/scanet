@@ -295,9 +295,16 @@ export async function renderDashboard(container) {
         </div>
     `;
 
-    // Attempt live API population
+    // Live API population — fetch real data from backend
     try {
-        const [tools, resources] = await Promise.all([api.getTools(), api.getResources()]);
+        const [tools, resources, targets, jobs, hosts] = await Promise.all([
+            api.getTools(),
+            api.getResources(),
+            api.getTargets(),
+            api.getJobs(),
+            api.getHosts(),
+        ]);
+
         if (tools) {
             document.getElementById('kpi-tools').textContent = `${tools.installed_count}/${tools.total_count}`;
         }
@@ -305,7 +312,29 @@ export async function renderDashboard(container) {
             document.getElementById('res-cpu-pct').textContent = `${resources.cpu_percent}%`;
             document.getElementById('res-ram-pct').textContent = `${resources.ram.used_mb} MB / ${resources.ram.total_mb} MB`;
         }
+        if (targets) {
+            const kpiTargets = document.getElementById('kpi-targets');
+            const kpiSub     = kpiTargets?.nextElementSibling;
+            if (kpiTargets) kpiTargets.textContent = targets.total;
+            if (kpiSub)     kpiSub.textContent     = targets.targets.map(t => t.name).slice(0, 3).join(', ') || 'No targets yet';
+        }
+        if (jobs) {
+            const running = (jobs.jobs || []).filter(j => j.status === 'running').length;
+            const total   = jobs.total;
+            const kpiScans = document.getElementById('kpi-scans');
+            if (kpiScans) kpiScans.textContent = running;
+            const kpiScansSub = kpiScans?.nextElementSibling;
+            if (kpiScansSub) kpiScansSub.textContent = `${total} total jobs in history`;
+        }
+        if (hosts) {
+            const totalPorts = (hosts.hosts || []).reduce((acc, h) => acc + (h.ports?.length || 0), 0);
+            const kpiScore = document.getElementById('kpi-score');
+            if (kpiScore && hosts.total > 0) {
+                kpiScore.innerHTML = `${hosts.total}<span style="font-size:1.1rem;color:var(--color-text-dim)"> hosts / ${totalPorts} ports</span>`;
+            }
+        }
     } catch (e) {
-        // Graceful static dashboard rendering
+        // Graceful fallback — static dashboard rendering remains visible
+        console.warn('[scanet] Dashboard API fetch failed:', e.message);
     }
 }
