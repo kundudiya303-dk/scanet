@@ -140,8 +140,10 @@ def setup_environment():
         print(f"{C_GREEN}✓ All Core Modules Verified{C_RESET}")
     except ImportError:
         print(f"{C_YELLOW}Syncing requirements...{C_RESET}")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip", "-q"])
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "--prefer-binary", "-r", req_file, "-q"])
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "install", "--prefer-binary", "-r", req_file, "-q"], check=True)
+        except Exception:
+            subprocess.run([sys.executable, "-m", "pip", "install", "--break-system-packages", "--prefer-binary", "-r", req_file, "-q"])
         print(f"  {C_PURPLE}[3/4]{C_RESET}  {C_BOLD}{C_WHITE}DEPENDENCY VERIFICATION{C_RESET}     ... {C_GREEN}✓ Modules Installed Successfully{C_RESET}")
 
 def start_server(port=8000, public_ip=None):

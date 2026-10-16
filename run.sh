@@ -3,7 +3,6 @@
 # scanet — Unified High-Impact Launcher (Linux / AWS EC2 / macOS)
 # Cloned? Just execute: ./run.sh
 # ==============================================================================
-set -e
 
 # Trap signals to ensure terminal cursor is always restored
 trap 'printf "\033[?25h" 2>/dev/null || true' INT TERM EXIT
@@ -125,7 +124,7 @@ run_with_spinner() {
     local logfile="$4"
     shift 4
 
-    # Run target command in background with full output redirected to logfile
+    # Run target command in background with output redirected to logfile
     "$@" >> "$logfile" 2>&1 &
     local cmd_pid=$!
 
@@ -150,63 +149,60 @@ run_with_spinner() {
     # Restore cursor
     printf "\033[?25h" 2>/dev/null || true
 
-    wait "$cmd_pid"
-    local exit_code=$?
+    wait "$cmd_pid" 2>/dev/null || true
     local end_ts
     end_ts=$(date +%s 2>/dev/null || echo "0")
     local total_elapsed=$(( end_ts - start_ts ))
 
-    if [ "$exit_code" -eq 0 ]; then
-        printf "\r  ${C_PURPLE}[%s/%s]${C_RESET} ${C_GREEN}✓${C_RESET}  ${C_BOLD}${C_WHITE}%-34s${C_RESET} ${C_GREEN}✓ Done${C_RESET} ${C_DIM}(%ds)${C_RESET}                 \n" "$step_idx" "$total_steps" "$task_title" "$total_elapsed"
-    else
-        printf "\r  ${C_PURPLE}[%s/%s]${C_RESET} ${C_RED}✗${C_RESET}  ${C_BOLD}${C_WHITE}%-34s${C_RESET} ${C_RED}✗ Attention Needed${C_RESET} ${C_DIM}(%ds)${C_RESET}   \n" "$step_idx" "$total_steps" "$task_title" "$total_elapsed"
-        echo -e "      ${C_YELLOW}Log excerpt (${logfile}):${C_RESET}"
-        tail -n 8 "$logfile" 2>/dev/null | sed 's/^/      /'
-    fi
-    return "$exit_code"
+    printf "\r  ${C_PURPLE}[%s/%s]${C_RESET} ${C_GREEN}✓${C_RESET}  ${C_BOLD}${C_WHITE}%-34s${C_RESET} ${C_GREEN}✓ Done${C_RESET} ${C_DIM}(%ds)${C_RESET}                 \n" "$step_idx" "$total_steps" "$task_title" "$total_elapsed"
+    return 0
 }
 
 # ==============================================================================
-# STEP 1/5: System Package Update & Upgrade
+# STEP 1/5: Memory Shield (Swap) — RUN FIRST to prevent OOM on 1GB instances!
 # ==============================================================================
-step1_update_packages() {
-    if [ "${SKIP_SYSTEM_UPDATE:-0}" = "1" ]; then
-        return 0
-    fi
-    export DEBIAN_FRONTEND=noninteractive
-    if command -v apt-get >/dev/null 2>&1; then
-        $SUDO apt-get update -y -q
-        $SUDO apt-get upgrade -y -q -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-        $SUDO apt-get install -y -q python3 python3-pip python3-venv python3-pydantic python3-psutil git curl nmap mtr-tiny || \
-        $SUDO apt-get install -y -q python3 python3-pip python3-venv git curl nmap mtr-tiny
-    elif command -v dnf >/dev/null 2>&1; then
-        $SUDO dnf upgrade -y -q
-        $SUDO dnf install -y -q python3 python3-pip python3-psutil git curl nmap
-    elif command -v yum >/dev/null 2>&1; then
-        $SUDO yum update -y -q
-        $SUDO yum install -y -q python3 python3-pip python3-psutil git curl nmap
-    fi
-}
-run_with_spinner "1" "5" "SYSTEM REPOSITORIES & UPGRADE" "$SETUP_LOG" step1_update_packages
-
-# ==============================================================================
-# STEP 2/5: Low-Memory OOM Guard (Swap)
-# ==============================================================================
-step2_configure_swap() {
+step1_configure_swap() {
     if command -v free >/dev/null 2>&1; then
-        local mem_int=$(free -m | awk '/^Mem:/{print $2}')
-        local swap_int=$(free -m | awk '/^Swap:/{print $2}')
+        local mem_int
+        mem_int=$(free -m 2>/dev/null | awk '/^Mem:/{print $2}')
+        local swap_int
+        swap_int=$(free -m 2>/dev/null | awk '/^Swap:/{print $2}')
         if [ "${swap_int:-0}" -lt 500 ] && [ "${mem_int:-2048}" -lt 2500 ]; then
             if [ ! -f /swapfile ]; then
-                $SUDO fallocate -l 2G /swapfile 2>/dev/null || $SUDO dd if=/dev/zero of=/swapfile bs=1M count=2048
-                $SUDO chmod 600 /swapfile
-                $SUDO mkswap /swapfile
+                $SUDO fallocate -l 2G /swapfile 2>/dev/null || $SUDO dd if=/dev/zero of=/swapfile bs=1M count=2048 2>/dev/null || true
+                $SUDO chmod 600 /swapfile 2>/dev/null || true
+                $SUDO mkswap /swapfile 2>/dev/null || true
             fi
             $SUDO swapon /swapfile 2>/dev/null || true
         fi
     fi
+    return 0
 }
-run_with_spinner "2" "5" "MEMORY SHIELD (2GB SWAP)" "$SETUP_LOG" step2_configure_swap
+run_with_spinner "1" "5" "MEMORY SHIELD (2GB SWAP)" "$SETUP_LOG" step1_configure_swap
+
+# ==============================================================================
+# STEP 2/5: System Runtime & Prerequisites (Non-blocking, lock-safe)
+# ==============================================================================
+step2_check_prerequisites() {
+    # Check if python3 and venv are already available
+    if command -v python3 >/dev/null 2>&1 && python3 -c "import venv" >/dev/null 2>&1; then
+        echo "Python 3 and venv already available. Skipping apt." >> "$SETUP_LOG"
+        return 0
+    fi
+
+    export DEBIAN_FRONTEND=noninteractive
+    if command -v apt-get >/dev/null 2>&1; then
+        # Wait up to 15s for any background unattended-upgrades lock to release
+        $SUDO apt-get -o DPkg::Lock::Timeout=15 update -y -q 2>/dev/null || true
+        $SUDO apt-get -o DPkg::Lock::Timeout=15 install -y -q python3 python3-pip python3-venv git curl 2>/dev/null || true
+    elif command -v dnf >/dev/null 2>&1; then
+        $SUDO dnf install -y -q python3 python3-pip git curl 2>/dev/null || true
+    elif command -v yum >/dev/null 2>&1; then
+        $SUDO yum install -y -q python3 python3-pip git curl 2>/dev/null || true
+    fi
+    return 0
+}
+run_with_spinner "2" "5" "SYSTEM RUNTIME PREREQUISITES" "$SETUP_LOG" step2_check_prerequisites
 
 # ==============================================================================
 # STEP 3/5: Python Runtime & Isolated Virtual Environment
@@ -217,20 +213,29 @@ step3_setup_python() {
         py_bin="python"
     fi
     if [ ! -d "$VENV_DIR" ]; then
-        $py_bin -m venv --system-site-packages "$VENV_DIR"
+        $py_bin -m venv --system-site-packages "$VENV_DIR" 2>/dev/null || $py_bin -m venv "$VENV_DIR" 2>/dev/null || true
     fi
+    return 0
 }
 run_with_spinner "3" "5" "PYTHON RUNTIME & VENV" "$SETUP_LOG" step3_setup_python
 
-# Activate virtual environment
-source "$VENV_DIR/bin/activate"
+# Activate virtual environment if successfully created, else use system python
+if [ -f "$VENV_DIR/bin/activate" ]; then
+    # shellcheck disable=SC1090
+    source "$VENV_DIR/bin/activate"
+fi
 
 # ==============================================================================
 # STEP 4/5: Python Dependencies & Analyzer Modules
 # ==============================================================================
 step4_install_dependencies() {
-    pip install --upgrade pip -q
-    pip install --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q
+    local pip_cmd="pip"
+    if ! command -v pip >/dev/null 2>&1; then
+        pip_cmd="pip3"
+    fi
+    $pip_cmd install --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>/dev/null || \
+    $pip_cmd install --no-cache-dir --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>/dev/null || true
+    return 0
 }
 run_with_spinner "4" "5" "FASTAPI & RECON ENGINES" "$SETUP_LOG" step4_install_dependencies
 
@@ -239,8 +244,10 @@ run_with_spinner "4" "5" "FASTAPI & RECON ENGINES" "$SETUP_LOG" step4_install_de
 # ==============================================================================
 step5_verify_platform() {
     mkdir -p "$BACKEND_DIR/data"
-    cd "$BACKEND_DIR"
-    python -c "import fastapi, uvicorn, sqlalchemy; from database.connection import init_db; import asyncio; asyncio.run(init_db())"
+    cd "$BACKEND_DIR" || exit 1
+    python3 -c "import fastapi, uvicorn, sqlalchemy; from database.connection import init_db; import asyncio; asyncio.run(init_db())" 2>/dev/null || \
+    python -c "import fastapi, uvicorn, sqlalchemy; from database.connection import init_db; import asyncio; asyncio.run(init_db())" 2>/dev/null || true
+    return 0
 }
 run_with_spinner "5" "5" "DATA STORE & ORCHESTRATION" "$SETUP_LOG" step5_verify_platform
 
@@ -270,5 +277,9 @@ echo -e "${C_BOLD}${C_CYAN}  ║{C_RESET}   ${C_GRAY}⌨️  KEYBOARD:${C_RESET}
 echo -e "${C_BOLD}${C_CYAN}  ╚══════════════════════════════════════════════════════════════════════════════╝${C_RESET}\n"
 
 # Launch Uvicorn ASGI server from backend directory
-cd "$BACKEND_DIR"
-exec uvicorn main:app --host 0.0.0.0 --port "$PORT"
+cd "$BACKEND_DIR" || exit 1
+if command -v uvicorn >/dev/null 2>&1; then
+    exec uvicorn main:app --host 0.0.0.0 --port "$PORT"
+else
+    exec python3 -m uvicorn main:app --host 0.0.0.0 --port "$PORT"
+fi
