@@ -173,6 +173,14 @@ def start_server(port=8000, public_ip=None):
     os.chdir(backend_dir)
     try:
         import uvicorn
+    except ImportError:
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "install", "--prefer-binary", "uvicorn", "fastapi", "sqlalchemy", "aiosqlite", "python-pptx"], check=True)
+        except Exception:
+            subprocess.run([sys.executable, "-m", "pip", "install", "--break-system-packages", "--prefer-binary", "uvicorn", "fastapi", "sqlalchemy", "aiosqlite", "python-pptx"])
+        import uvicorn
+
+    try:
         uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
     except KeyboardInterrupt:
         print(f"\n  {C_YELLOW}[*] scanet server terminated gracefully.{C_RESET}\n")

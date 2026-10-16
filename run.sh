@@ -104,7 +104,7 @@ if [ -t 0 ] && [ "${SCANET_NON_INTERACTIVE:-0}" != "1" ]; then
 fi
 
 # ==============================================================================
-# Professional Animated Progress Spinner
+# Setup Paths & Environment
 # ==============================================================================
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$PROJECT_ROOT/backend"
@@ -184,21 +184,17 @@ run_with_spinner "1" "5" "MEMORY SHIELD (2GB SWAP)" "$SETUP_LOG" step1_configure
 # STEP 2/5: System Runtime & Prerequisites (Non-blocking, lock-safe)
 # ==============================================================================
 step2_check_prerequisites() {
-    # Check if python3 and venv are already available
-    if command -v python3 >/dev/null 2>&1 && python3 -c "import venv" >/dev/null 2>&1; then
-        echo "Python 3 and venv already available. Skipping apt." >> "$SETUP_LOG"
-        return 0
-    fi
-
     export DEBIAN_FRONTEND=noninteractive
     if command -v apt-get >/dev/null 2>&1; then
-        # Wait up to 15s for any background unattended-upgrades lock to release
-        $SUDO apt-get -o DPkg::Lock::Timeout=15 update -y -q 2>/dev/null || true
-        $SUDO apt-get -o DPkg::Lock::Timeout=15 install -y -q python3 python3-pip python3-venv git curl 2>/dev/null || true
+        # Install python3-pip, python3-venv, and python3-uvicorn if not present
+        if ! command -v pip3 >/dev/null 2>&1 || ! python3 -c "import ensurepip" 2>/dev/null; then
+            $SUDO apt-get -o DPkg::Lock::Timeout=30 update -y -q 2>/dev/null || true
+            $SUDO apt-get -o DPkg::Lock::Timeout=30 install -y -q python3-pip python3-venv python3-full git curl 2>/dev/null || true
+        fi
     elif command -v dnf >/dev/null 2>&1; then
-        $SUDO dnf install -y -q python3 python3-pip git curl 2>/dev/null || true
+        $SUDO dnf install -y -q python3-pip git curl 2>/dev/null || true
     elif command -v yum >/dev/null 2>&1; then
-        $SUDO yum install -y -q python3 python3-pip git curl 2>/dev/null || true
+        $SUDO yum install -y -q python3-pip git curl 2>/dev/null || true
     fi
     return 0
 }
@@ -212,29 +208,44 @@ step3_setup_python() {
     if ! command -v python3 >/dev/null 2>&1; then
         py_bin="python"
     fi
-    if [ ! -d "$VENV_DIR" ]; then
-        $py_bin -m venv --system-site-packages "$VENV_DIR" 2>/dev/null || $py_bin -m venv "$VENV_DIR" 2>/dev/null || true
+
+    # If venv doesn't exist or is broken, recreate it
+    if [ ! -d "$VENV_DIR" ] || [ ! -f "$VENV_DIR/bin/activate" ]; then
+        rm -rf "$VENV_DIR" 2>/dev/null || true
+        $py_bin -m venv --system-site-packages "$VENV_DIR" 2>/dev/null || \
+        $py_bin -m venv "$VENV_DIR" 2>/dev/null || true
     fi
     return 0
 }
 run_with_spinner "3" "5" "PYTHON RUNTIME & VENV" "$SETUP_LOG" step3_setup_python
 
-# Activate virtual environment if successfully created, else use system python
+# Activate virtual environment if successfully created
 if [ -f "$VENV_DIR/bin/activate" ]; then
     # shellcheck disable=SC1090
     source "$VENV_DIR/bin/activate"
 fi
 
 # ==============================================================================
-# STEP 4/5: Python Dependencies & Analyzer Modules
+# STEP 4/5: Python Dependencies & Uvicorn ASGI Server
 # ==============================================================================
 step4_install_dependencies() {
-    local pip_cmd="pip"
-    if ! command -v pip >/dev/null 2>&1; then
-        pip_cmd="pip3"
+    # 1. Try venv pip first
+    if [ -f "$VENV_DIR/bin/pip" ]; then
+        "$VENV_DIR/bin/pip" install --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>>"$SETUP_LOG" || \
+        "$VENV_DIR/bin/pip" install --no-cache-dir --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>>"$SETUP_LOG" || true
     fi
-    $pip_cmd install --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>/dev/null || \
-    $pip_cmd install --no-cache-dir --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>/dev/null || true
+
+    # 2. Also ensure uvicorn and core packages exist in system/user environment as fail-safe
+    if ! python3 -c "import uvicorn" 2>/dev/null; then
+        python3 -m pip install --break-system-packages --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>>"$SETUP_LOG" || \
+        pip3 install --break-system-packages --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>>"$SETUP_LOG" || \
+        pip install --prefer-binary -r "$BACKEND_DIR/requirements.txt" -q 2>>"$SETUP_LOG" || true
+    fi
+
+    # 3. Direct uvicorn install guarantee
+    if ! python3 -c "import uvicorn" 2>/dev/null && [ ! -f "$VENV_DIR/bin/uvicorn" ]; then
+        python3 -m pip install --break-system-packages uvicorn fastapi sqlalchemy aiosqlite python-pptx 2>>"$SETUP_LOG" || true
+    fi
     return 0
 }
 run_with_spinner "4" "5" "FASTAPI & RECON ENGINES" "$SETUP_LOG" step4_install_dependencies
@@ -245,8 +256,11 @@ run_with_spinner "4" "5" "FASTAPI & RECON ENGINES" "$SETUP_LOG" step4_install_de
 step5_verify_platform() {
     mkdir -p "$BACKEND_DIR/data"
     cd "$BACKEND_DIR" || exit 1
-    python3 -c "import fastapi, uvicorn, sqlalchemy; from database.connection import init_db; import asyncio; asyncio.run(init_db())" 2>/dev/null || \
-    python -c "import fastapi, uvicorn, sqlalchemy; from database.connection import init_db; import asyncio; asyncio.run(init_db())" 2>/dev/null || true
+    if [ -f "$VENV_DIR/bin/python" ]; then
+        "$VENV_DIR/bin/python" -c "import fastapi, uvicorn, sqlalchemy; from database.connection import init_db; import asyncio; asyncio.run(init_db())" 2>>"$SETUP_LOG" || true
+    else
+        python3 -c "import fastapi, uvicorn, sqlalchemy; from database.connection import init_db; import asyncio; asyncio.run(init_db())" 2>>"$SETUP_LOG" || true
+    fi
     return 0
 }
 run_with_spinner "5" "5" "DATA STORE & ORCHESTRATION" "$SETUP_LOG" step5_verify_platform
@@ -278,8 +292,16 @@ echo -e "${C_BOLD}${C_CYAN}  ╚════════════════
 
 # Launch Uvicorn ASGI server from backend directory
 cd "$BACKEND_DIR" || exit 1
-if command -v uvicorn >/dev/null 2>&1; then
+
+# Multi-tier launch guarantee
+if [ -f "$VENV_DIR/bin/uvicorn" ]; then
+    exec "$VENV_DIR/bin/uvicorn" main:app --host 0.0.0.0 --port "$PORT"
+elif [ -f "$VENV_DIR/bin/python" ]; then
+    exec "$VENV_DIR/bin/python" -m uvicorn main:app --host 0.0.0.0 --port "$PORT"
+elif command -v uvicorn >/dev/null 2>&1; then
     exec uvicorn main:app --host 0.0.0.0 --port "$PORT"
 else
+    # Immediate inline installation if somehow missing
+    python3 -m pip install --break-system-packages uvicorn fastapi sqlalchemy aiosqlite python-pptx 2>/dev/null || true
     exec python3 -m uvicorn main:app --host 0.0.0.0 --port "$PORT"
 fi
