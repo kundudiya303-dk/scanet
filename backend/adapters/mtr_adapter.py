@@ -18,6 +18,10 @@ class MtrAdapter(BaseToolAdapter):
         )
 
     def build_command_args(self, target: str, options: dict) -> List[str]:
+        if not self.has_native_binary():
+            import sys
+            return [sys.executable, "-m", "engine.builtin_tools", "mtr", target]
+
         cycles = int(options.get("cycles", 5))
         cycles = min(max(cycles, 1), 20)  # 1–20 cycles max
         return [

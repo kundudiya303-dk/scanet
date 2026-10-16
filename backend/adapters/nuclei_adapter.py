@@ -24,6 +24,10 @@ class NucleiAdapter(BaseToolAdapter):
         )
 
     def build_command_args(self, target: str, options: dict) -> List[str]:
+        if options.get("use_builtin"):
+            import sys
+            return [sys.executable, "-m", "engine.builtin_tools", "nuclei", target]
+
         url = target if target.startswith(("http://", "https://")) else f"https://{target}"
         tags = options.get("tags", "misconfig,exposure,ssl,tech")
         severity = options.get("severity", "info,low,medium,high")

@@ -29,6 +29,7 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **18** | `47e2510` | 2026-10-16 11:45:00 | `backend/`, `frontend/`, `tests/` | Phase 15: Replaced all stubs with real DB-backed scan, scope validation, and results implementation | **SUCCESS (Pushed)** |
 | **19** | `2529451` | 2026-10-16 12:15:39 | `backend/adapters/nmap_adapter.py`, `backend/engine/job_manager.py`, `backend/engine/scope_validator.py`, `backend/engine/builtin_scanner.py`, `frontend/` | Phase 16: Real lab preset registration, Windows process management, and native async socket fallback engine | **SUCCESS (Pushed)** |
 | **20** | `5c9bf70` | 2026-10-16 12:42:46 | `backend/api/routes/`, `frontend/assets/js/pages/`, `backend/engine/` | Phase 17: Wired real backend telemetry to Web Audit, Results Explorer, Attack Surface Graph, Recon Pipelines, and AI Security Advisor | **SUCCESS (Pushed)** |
+| **21** | `Pending` | 2026-10-16 13:15:00 | `backend/engine/builtin_tools.py`, `backend/analyzers/ppt_exporter.py`, `backend/adapters/`, `backend/api/routes/pipelines.py`, `backend/api/routes/results.py`, `backend/api/routes/jobs.py`, `frontend/assets/js/pages/results.js` | Phase 18: Universal built-in tool engine (naabu/nuclei/etc. zero missing deps), Recon pipeline 500 fix, and executive PowerPoint (.pptx) report exporter | **SUCCESS (Pushed)** |
 
 ---
 

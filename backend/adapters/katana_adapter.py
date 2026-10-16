@@ -25,6 +25,10 @@ class KatanaAdapter(BaseToolAdapter):
         )
 
     def build_command_args(self, target: str, options: dict) -> List[str]:
+        if not self.has_native_binary():
+            import sys
+            return [sys.executable, "-m", "engine.builtin_tools", "katana", target]
+
         url = target if target.startswith(("http://", "https://")) else f"https://{target}"
         depth = int(options.get("depth", 2))
         max_duration = options.get("crawl_duration", "3m")

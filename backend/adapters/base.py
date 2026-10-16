@@ -48,28 +48,33 @@ class BaseToolAdapter(abc.ABC):
         """Adapter metadata: name, category, tier, description."""
         pass
 
-    def is_installed(self) -> bool:
-        """
-        Checks if the tool binary exists in system PATH
-        or in /opt/scanet/bin/.
-        """
+    def has_native_binary(self) -> bool:
+        """Checks if the external tool binary exists in system PATH."""
         return shutil.which(self.meta.tool_name) is not None
 
+    def is_installed(self) -> bool:
+        """
+        All registered adapters in Scanet are ALWAYS available:
+        - Uses native system binary if installed in PATH.
+        - Seamlessly falls back to Scanet's built-in async Python engine otherwise.
+        """
+        return True
+
     def get_version(self) -> str:
-        """Returns version string from the tool binary."""
-        if not self.is_installed():
-            return "Not Installed"
-        try:
-            result = subprocess.run(
-                [self.meta.tool_name, "--version"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
-            output = result.stdout or result.stderr
-            return output.splitlines()[0].strip() if output else "Unknown"
-        except Exception:
-            return "Unknown"
+        """Returns version string from binary or built-in engine indicator."""
+        if self.has_native_binary():
+            try:
+                result = subprocess.run(
+                    [self.meta.tool_name, "--version"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5,
+                )
+                output = result.stdout or result.stderr
+                return output.splitlines()[0].strip() if output else f"{self.meta.tool_name} (native binary)"
+            except Exception:
+                return f"{self.meta.tool_name} (native binary)"
+        return f"Scanet Native Engine v1.0 ({self.meta.tool_name}-compatible)"
 
     @abc.abstractmethod
     def build_command_args(self, target: str, options: dict) -> List[str]:

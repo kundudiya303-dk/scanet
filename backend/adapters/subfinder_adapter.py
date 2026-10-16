@@ -18,6 +18,9 @@ class SubfinderAdapter(BaseToolAdapter):
         )
 
     def build_command_args(self, target: str, options: dict) -> List[str]:
+        if not self.has_native_binary():
+            import sys
+            return [sys.executable, "-m", "engine.builtin_tools", "subfinder", target]
         return ["subfinder", "-d", target, "-json", "-silent"]
 
     def parse_output(self, raw_output: str, exit_code: int) -> dict:

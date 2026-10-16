@@ -67,7 +67,18 @@ async def create_job(body: JobCreateRequest, db: AsyncSession = Depends(get_db))
 
     # 4. Build command args
     params = body.parameters or {}
-    cmd_args = adapter.build_command_args(target.value, params)
+    if not adapter.has_native_binary():
+        import sys
+        if body.tool_name == "nmap":
+            cmd_args = [
+                sys.executable, "-m", "engine.builtin_scanner", target.value,
+                "--ports", str(params.get("ports", "top-100")),
+                "--speed", str(params.get("speed", "3"))
+            ]
+        else:
+            cmd_args = [sys.executable, "-m", "engine.builtin_tools", body.tool_name, target.value]
+    else:
+        cmd_args = adapter.build_command_args(target.value, params)
 
     # 5. Create DB job record
     job_id = new_uuid()

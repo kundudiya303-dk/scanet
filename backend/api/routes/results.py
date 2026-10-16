@@ -169,8 +169,8 @@ async def export_results(
     job_id: str = None,
     db: AsyncSession = Depends(get_db)
 ):
-    """Export results in: json | sarif"""
-    supported = ["json", "sarif"]
+    """Export results in: json | sarif | pptx | ppt"""
+    supported = ["json", "sarif", "pptx", "ppt"]
     if format not in supported:
         raise HTTPException(status_code=400, detail=f"Unsupported format. Choose from: {supported}")
 
@@ -183,8 +183,10 @@ async def export_results(
 
     findings_data = [
         {
+            "id":          f.id,
             "template_id": f.category,
             "name":        f.title,
+            "title":       f.title,
             "severity":    f.severity,
             "description": f.description,
             "matched_at":  f.evidence or "",
@@ -198,6 +200,50 @@ async def export_results(
             job_id=job_id or "all",
             target="multiple",
             findings=findings_data,
+        )
+
+    if format in ["pptx", "ppt"]:
+        from fastapi.responses import Response
+        from analyzers.ppt_exporter import generate_scan_presentation
+
+        # Gather hosts and ports
+        hq = select(Host)
+        if job_id:
+            hq = hq.where(Host.job_id == job_id)
+        h_res = await db.execute(hq)
+        hosts = h_res.scalars().all()
+
+        hosts_data = []
+        for h in hosts:
+            pq = select(Port).where(Port.host_id == h.id)
+            p_res = await db.execute(pq)
+            ports = p_res.scalars().all()
+            hosts_data.append({
+                "ip_address": h.ip_address,
+                "hostname": h.hostname,
+                "os_fingerprint": h.os_fingerprint,
+                "ports": [
+                    {
+                        "port_number": p.port_number,
+                        "protocol": p.protocol,
+                        "service_name": p.service_name,
+                        "product": p.product,
+                        "version": p.version,
+                    }
+                    for p in ports
+                ]
+            })
+
+        ppt_stream = generate_scan_presentation(
+            target_name="Automated Network Assessment",
+            hosts=hosts_data,
+            findings=findings_data
+        )
+
+        return Response(
+            content=ppt_stream.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            headers={"Content-Disposition": "attachment; filename=scanet_security_report.pptx"}
         )
 
     return JSONResponse(content={"job_id": job_id, "findings": findings_data, "total": len(findings_data)})

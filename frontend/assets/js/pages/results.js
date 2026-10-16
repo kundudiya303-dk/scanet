@@ -11,7 +11,8 @@ export async function renderResults(container) {
                 <h2>Normalized Results &amp; Audit Findings</h2>
                 <p style="color: var(--color-text-muted);">Inspect discovered hosts, open ports, identified services, and vulnerability findings.</p>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-emerald" id="btn-export-pptx" style="box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);">📊 Export PPT Slides</button>
                 <button class="btn btn-primary" id="btn-export-sarif">📥 Export SARIF</button>
                 <button class="btn btn-secondary" id="btn-export-json">📥 Export JSON</button>
             </div>
@@ -65,6 +66,9 @@ export async function renderResults(container) {
     `;
 
     // Wire export buttons
+    document.getElementById('btn-export-pptx').addEventListener('click', () => {
+        window.open(api.exportResults('pptx'), '_blank');
+    });
     document.getElementById('btn-export-sarif').addEventListener('click', () => {
         window.open(api.exportResults('sarif'), '_blank');
     });
