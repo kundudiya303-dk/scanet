@@ -32,6 +32,9 @@ This document tracks all files, folders, commit hashes, and timestamps pushed to
 | **21** | `59f91f5` | 2026-10-16 13:15:00 | `backend/engine/builtin_tools.py`, `backend/analyzers/ppt_exporter.py`, `backend/adapters/`, `backend/api/routes/pipelines.py`, `backend/api/routes/results.py`, `backend/api/routes/jobs.py`, `frontend/assets/js/pages/results.js` | Phase 18: Universal built-in tool engine (naabu/nuclei/etc. zero missing deps), Recon pipeline 500 fix, and executive PowerPoint (.pptx) report exporter | **SUCCESS (Pushed)** |
 | **22** | `0cfdfa7` | 2026-10-16 13:30:00 | `run.sh`, `run.py`, `records/GITHUB_UPLOAD_TRACKER.md` | Phase 19: Made run.sh resilient on AWS EC2 micro instances: swapped swap shield to step 1, removed apt-get upgrade lock hanging, removed fatal set -e, made pip install fail-safe | **SUCCESS (Pushed)** |
 | **23** | `cf934ed` | 2026-10-16 13:40:00 | `run.sh`, `run.py`, `records/GITHUB_UPLOAD_TRACKER.md` | Phase 20: Guaranteed uvicorn launch via venv binary resolution and automated fallback installation with --break-system-packages | **SUCCESS (Pushed)** |
+| **24** | `6ddd8e0` | 2026-10-23 18:00:00 | `run.py`, `run.sh`, `docker/Dockerfile` | fix: make setup portable across machines | **SUCCESS (Pushed)** |
+| **25** | `123bd5a` | 2026-10-23 18:25:00 | `.github/workflows/ci.yml`, `tests/test_runtime.py` | ci: verify cross-platform and container startup | **SUCCESS (Pushed)** |
+| **26** | `1d60bdf` | 2026-10-23 19:37:50 | `LICENSE`, `README.md`, `run.py`, `backend/analyzers/sarif_exporter.py`, `docs/`, `records/` | fix: update repository ownership to kundudiya303-dk and use local IP resolution in launcher | **SUCCESS (Pushed)** |
 
 ---
 
