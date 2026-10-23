@@ -35,6 +35,9 @@ COPY wordlists/ /scanet/wordlists/
 # Create data directory
 RUN mkdir -p /scanet/backend/data
 
+# Run from the backend directory so `main:app` and the documented paths resolve.
+WORKDIR /scanet/backend
+
 # Expose API port
 EXPOSE 8000
 
@@ -43,4 +46,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s \
     CMD curl -f http://localhost:8000/api/v1/system/health || exit 1
 
 # Start server
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

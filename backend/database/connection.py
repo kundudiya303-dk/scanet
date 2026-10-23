@@ -4,14 +4,22 @@ SQLite with Write-Ahead Logging (WAL) mode for concurrent reads.
 """
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.engine import make_url
 from config import settings
-import os
+from pathlib import Path
 
-# Ensure data directory exists
-os.makedirs("data", exist_ok=True)
+database_url = make_url(settings.DATABASE_URL)
+if database_url.get_backend_name() == "sqlite":
+    database_path = database_url.database
+    if database_path and database_path != ":memory:":
+        path = Path(database_path)
+        if not path.is_absolute():
+            path = Path(__file__).resolve().parent.parent / path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        database_url = database_url.set(database=str(path))
 
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    database_url,
     echo=settings.DEBUG,
     connect_args={
         "check_same_thread": False,

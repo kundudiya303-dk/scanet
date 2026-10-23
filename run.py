@@ -10,6 +10,44 @@ import subprocess
 import urllib.request
 import socket
 import time
+import hashlib
+import venv
+
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_DIR = os.path.join(PROJECT_DIR, "backend")
+VENV_DIR = os.path.join(BACKEND_DIR, ".venv")
+
+
+def ensure_project_environment():
+    """Run from the project virtual environment, creating it on first launch."""
+    if sys.version_info < (3, 10):
+        print(f"Python 3.10+ is required; found {platform.python_version()}.")
+        raise SystemExit(1)
+
+    venv_python = os.path.join(
+        VENV_DIR,
+        "Scripts" if os.name == "nt" else "bin",
+        "python.exe" if os.name == "nt" else "python",
+    )
+    if os.path.exists(venv_python) and os.path.samefile(sys.executable, venv_python):
+        return
+
+    if not os.path.exists(venv_python):
+        print("Creating the project virtual environment...")
+        try:
+            os.makedirs(BACKEND_DIR, exist_ok=True)
+            venv.EnvBuilder(with_pip=True).create(VENV_DIR)
+        except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
+            print(f"Could not create the project virtual environment: {exc}")
+            raise SystemExit(1) from exc
+
+    try:
+        result = subprocess.run([venv_python, os.path.abspath(__file__), *sys.argv[1:]])
+    except OSError as exc:
+        print(f"Could not start the project virtual environment: {exc}")
+        raise SystemExit(1) from exc
+    raise SystemExit(result.returncode)
 
 # Enforce UTF-8 encoding across Windows, Linux, and macOS consoles
 if hasattr(sys.stdout, "reconfigure"):
@@ -122,34 +160,40 @@ def check_python():
     print(f"  {C_PURPLE}[1/4]{C_RESET}  {C_BOLD}{C_WHITE}PYTHON RUNTIME VERIFICATION{C_RESET} ... {C_GREEN}✓ Python {platform.python_version()} Compatible{C_RESET}")
 
 def setup_environment():
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    backend_dir = os.path.join(root_dir, "backend")
-    data_dir = os.path.join(backend_dir, "data")
+    data_dir = os.path.join(BACKEND_DIR, "data")
     os.makedirs(data_dir, exist_ok=True)
 
     print(f"  {C_PURPLE}[2/4]{C_RESET}  {C_BOLD}{C_WHITE}DATA STORE PROVISIONING{C_RESET}     ... {C_GREEN}✓ SQLite Directory Active{C_RESET}")
 
-    req_file = os.path.join(backend_dir, "requirements.txt")
-    print(f"  {C_PURPLE}[3/4]{C_RESET}  {C_BOLD}{C_WHITE}DEPENDENCY VERIFICATION{C_RESET}     ... ", end="", flush=True)
+    req_file = os.path.join(BACKEND_DIR, "requirements.txt")
+    marker_file = os.path.join(VENV_DIR, ".requirements.sha256")
+    with open(req_file, "rb") as requirements:
+        requirements_hash = hashlib.sha256(requirements.read()).hexdigest()
 
+    print(f"  {C_PURPLE}[3/4]{C_RESET}  {C_BOLD}{C_WHITE}DEPENDENCY VERIFICATION{C_RESET}     ... ", end="", flush=True)
     try:
-        import fastapi
-        import uvicorn
-        import sqlalchemy
-        import aiosqlite
-        print(f"{C_GREEN}✓ All Core Modules Verified{C_RESET}")
-    except ImportError:
-        print(f"{C_YELLOW}Syncing requirements...{C_RESET}")
-        try:
-            subprocess.run([sys.executable, "-m", "pip", "install", "--prefer-binary", "-r", req_file, "-q"], check=True)
-        except Exception:
-            subprocess.run([sys.executable, "-m", "pip", "install", "--break-system-packages", "--prefer-binary", "-r", req_file, "-q"])
-        print(f"  {C_PURPLE}[3/4]{C_RESET}  {C_BOLD}{C_WHITE}DEPENDENCY VERIFICATION{C_RESET}     ... {C_GREEN}✓ Modules Installed Successfully{C_RESET}")
+        installed_hash = ""
+        if os.path.isfile(marker_file):
+            with open(marker_file, "r", encoding="ascii") as marker:
+                installed_hash = marker.read().strip()
+        if installed_hash != requirements_hash:
+            print(f"{C_YELLOW}Installing project dependencies...{C_RESET}")
+            subprocess.run(
+                [
+                    sys.executable, "-m", "pip", "install",
+                    "--prefer-binary", "-r", req_file,
+                ],
+                check=True,
+            )
+            with open(marker_file, "w", encoding="ascii") as marker:
+                marker.write(requirements_hash)
+        print(f"{C_GREEN}✓ Project dependencies ready{C_RESET}")
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(f"\n{C_RED}Dependency installation failed: {exc}{C_RESET}")
+        raise SystemExit(1) from exc
 
 def start_server(port=8000, public_ip=None):
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    backend_dir = os.path.join(root_dir, "backend")
-    sys.path.insert(0, backend_dir)
+    sys.path.insert(0, BACKEND_DIR)
 
     print(f"  {C_PURPLE}[4/4]{C_RESET}  {C_BOLD}{C_WHITE}SERVER ORCHESTRATION{C_RESET}        ... {C_GREEN}✓ ASGI Interface Ready{C_RESET}")
 
@@ -170,15 +214,11 @@ def start_server(port=8000, public_ip=None):
     print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_GRAY}⌨️  KEYBOARD:{C_RESET}      Press {C_WHITE}[CTRL + C]{C_RESET} anytime to shut down the server.           {C_BOLD}{C_CYAN}║{C_RESET}")
     print(f"{C_BOLD}{C_CYAN}  ╚══════════════════════════════════════════════════════════════════════════════╝{C_RESET}\n")
 
-    os.chdir(backend_dir)
     try:
         import uvicorn
     except ImportError:
-        try:
-            subprocess.run([sys.executable, "-m", "pip", "install", "--prefer-binary", "uvicorn", "fastapi", "sqlalchemy", "aiosqlite", "python-pptx"], check=True)
-        except Exception:
-            subprocess.run([sys.executable, "-m", "pip", "install", "--break-system-packages", "--prefer-binary", "uvicorn", "fastapi", "sqlalchemy", "aiosqlite", "python-pptx"])
-        import uvicorn
+        print(f"{C_RED}Uvicorn is missing from the configured environment. Re-run the launcher to install dependencies.{C_RESET}")
+        raise SystemExit(1)
 
     try:
         uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
@@ -186,6 +226,7 @@ def start_server(port=8000, public_ip=None):
         print(f"\n  {C_YELLOW}[*] scanet server terminated gracefully.{C_RESET}\n")
 
 if __name__ == "__main__":
+    ensure_project_environment()
     port = 8000
     if len(sys.argv) > 1 and sys.argv[1].isdigit():
         port = int(sys.argv[1])

@@ -10,7 +10,11 @@ except ImportError:
             for k, v in kwargs.items():
                 setattr(self, k, v)
 from typing import List
-import os
+from pathlib import Path
+
+
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+WORDLISTS_DIR = str(PROJECT_DIR / "wordlists")
 
 
 class Settings(BaseSettings):
@@ -35,8 +39,8 @@ class Settings(BaseSettings):
     DEFAULT_JOB_TIMEOUT: int = 600  # seconds
 
     # Wordlists
-    WORDLIST_DIR: str = "../wordlists"
-    WORDLISTS_DIR: str = "../wordlists"
+    WORDLIST_DIR: str = WORDLISTS_DIR
+    WORDLISTS_DIR: str = WORDLISTS_DIR
 
 
     # Scope — block these from being scanned under any circumstances
@@ -48,7 +52,7 @@ class Settings(BaseSettings):
     ]
 
     class Config:
-        env_file = ".env"
+        env_file = str(Path(__file__).resolve().parent / ".env")
         env_file_encoding = "utf-8"
 
 

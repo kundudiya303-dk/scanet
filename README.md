@@ -24,6 +24,9 @@ git clone https://github.com/mjishaan59-cell/scanet.git
 cd scanet
 ./run.sh
 ```
+Install Python 3.10 or newer first. On first launch, the script creates
+`backend/.venv` and installs the Python dependencies; native scanner binaries
+are optional. The first install requires internet access.
 > **🌐 AWS EC2 Quick Access (No HTTPS / No Domain Needed):**  
 > 1. In your **AWS EC2 Security Group**, add an Inbound Rule for **Custom TCP Port 8000** (Source: `0.0.0.0/0` or your IP).  
 > 2. Open `http://<YOUR_EC2_PUBLIC_IP>:8000` in your browser.  
@@ -36,11 +39,29 @@ git clone https://github.com/mjishaan59-cell/scanet.git
 cd scanet
 run.bat
 ```
+Install **Python 3.10 or newer** first and enable **Add python.exe to PATH** in
+the Python installer. On first launch, `run.bat` creates an isolated environment
+in `backend\.venv` and installs `backend\requirements.txt`; later launches reuse
+it. The first install needs an internet connection. If Windows says Python was
+not found, install it from [python.org](https://www.python.org/downloads/) and
+open a new terminal before retrying.
 
 ### Any System (Python 3.10+):
 ```bash
 python run.py
 ```
+The launcher creates `backend/.venv` and installs the Python dependencies on
+first launch (or when `backend/requirements.txt` changes). No global Python
+packages are modified. Native scanner binaries are optional: scanet uses its
+built-in Python engines when those tools are not installed.
+
+### Docker
+With Docker Desktop or Docker Engine and the Compose plugin installed, build and
+start the container with:
+```bash
+docker compose -f docker/docker-compose.yml up --build
+```
+Then open `http://localhost:8000`. The database is persisted in a Docker volume.
 
 ---
 

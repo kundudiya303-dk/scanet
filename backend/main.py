@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
+from pathlib import Path
 import uvicorn
 
 from config import settings
@@ -53,16 +54,20 @@ app.include_router(web_audit.router, prefix="/api/v1/web-audit", tags=["Web Secu
 
 
 # ── Serve Frontend Static Files ───────────────────────────────────────────────
-app.mount("/assets", StaticFiles(directory="../frontend/assets"), name="assets")
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+ASSETS_DIR = FRONTEND_DIR / "assets"
+EMBLEM_PATH = ASSETS_DIR / "images" / "scanet_emblem.svg"
+
+app.mount("/assets", StaticFiles(directory=str(ASSETS_DIR)), name="assets")
 
 @app.get("/", include_in_schema=False)
 async def serve_frontend():
-    return FileResponse("../frontend/index.html")
+    return FileResponse(str(FRONTEND_DIR / "index.html"))
 
 @app.get("/favicon.ico", include_in_schema=False)
 @app.get("/favicon.svg", include_in_schema=False)
 async def serve_favicon():
-    return FileResponse("../frontend/assets/images/scanet_emblem.svg")
+    return FileResponse(str(EMBLEM_PATH))
 
 
 
