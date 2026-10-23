@@ -1,49 +1,38 @@
-# scanet — Docker Container
-# Lightweight Python base with Alpine for minimal image size.
+# scanet — portable container image for local and cloud deployments
 FROM python:3.12-slim
 
-LABEL maintainer="mjishaan59-cell"
 LABEL description="scanet: Lightweight Web-Based Cybersecurity Toolkit"
-LABEL version="0.1.0"
 
-# System packages: nmap, mtr, curl, wget, dig, unzip
+# Scanner binaries are optional; the Python engines work without them.
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
-        nmap mtr-tiny curl wget dnsutils unzip ca-certificates && \
+        nmap mtr-tiny curl dnsutils ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Create scanet tool binary directory
-RUN mkdir -p /opt/scanet/bin
-ENV PATH="/opt/scanet/bin:${PATH}"
-
-# Set work directory
 WORKDIR /scanet
 
-# Install Python dependencies
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    HOST=0.0.0.0 \
+    PORT=8000
+
 COPY backend/requirements.txt /scanet/requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --no-cache-dir --prefer-binary -r /scanet/requirements.txt
 
-# Copy backend source
 COPY backend/ /scanet/backend/
-
-# Copy frontend
 COPY frontend/ /scanet/frontend/
-
-# Copy wordlists
 COPY wordlists/ /scanet/wordlists/
 
-# Create data directory
-RUN mkdir -p /scanet/backend/data
+RUN mkdir -p /scanet/backend/data && \
+    useradd --system --uid 10001 --create-home scanet && \
+    chown -R scanet:scanet /scanet/backend/data
 
-# Run from the backend directory so `main:app` and the documented paths resolve.
 WORKDIR /scanet/backend
+USER scanet
 
-# Expose API port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s \
-    CMD curl -f http://localhost:8000/api/v1/system/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD ["python", "-c", "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:%s/api/v1/system/health' % os.environ.get('PORT', '8000'), timeout=3)"]
 
-# Start server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "exec uvicorn main:app --host \"$HOST\" --port \"$PORT\""]

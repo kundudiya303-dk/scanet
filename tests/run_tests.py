@@ -24,6 +24,7 @@ def discover_and_run(iterations=1):
         os.path.join(PROJECT_ROOT, "tests", "test_analyzers", "test_web_auditor.py"),
         os.path.join(PROJECT_ROOT, "tests", "test_analyzers", "test_subdomain_takeover.py"),
         os.path.join(PROJECT_ROOT, "tests", "test_engine", "test_scope_validator.py"),
+        os.path.join(PROJECT_ROOT, "tests", "test_runtime.py"),
     ]
 
     total_runs = 0

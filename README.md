@@ -56,12 +56,31 @@ packages are modified. Native scanner binaries are optional: scanet uses its
 built-in Python engines when those tools are not installed.
 
 ### Docker
-With Docker Desktop or Docker Engine and the Compose plugin installed, build and
-start the container with:
+For the same setup across Windows, macOS, Linux, and Docker-based cloud
+services, install Docker Desktop or Docker Engine with the Compose plugin and
+run:
 ```bash
 docker compose -f docker/docker-compose.yml up --build
 ```
-Then open `http://localhost:8000`. The database is persisted in a Docker volume.
+Open `http://localhost:8000`. The database is persisted in a Docker volume.
+Change the host port with `SCANET_PORT=8080` (in PowerShell, use
+`$env:SCANET_PORT="8080"` before running Compose). To change both host and
+container ports, set both `PORT` and `SCANET_PORT` to `8080`.
+
+For a cloud container service, build from the repository root using
+`docker/Dockerfile`. The server listens on `0.0.0.0` and honors the platform's
+`PORT` setting. Attach persistent writable storage at
+`/scanet/backend/data` (the container runs as UID `10001`); otherwise SQLite
+data may be lost when a cloud instance is replaced. Keep this SQLite deployment
+to a single app instance; SQLite data files must not be shared between replicas.
+Configure the cloud firewall/reverse proxy and HTTPS according to the provider.
+The image includes Python-based scanner fallbacks; optional native tools do not
+all run on every OS or cloud runtime.
+
+The automated CI workflow runs the test suite and a launch/static-file smoke
+test on Windows, macOS, and Linux with Python 3.10, 3.12, and 3.13, and builds
+the Docker image on Linux. This is the tested support matrix, not a guarantee
+for every possible machine, operating-system release, or cloud service.
 
 ---
 
@@ -88,7 +107,7 @@ Then open `http://localhost:8000`. The database is persisted in a Docker volume.
 - 📡 **Real-Time Job Control** — Non-blocking process execution via Linux process groups (`os.setsid`), live Server-Sent Events (SSE) streaming, and deterministic `SIGTERM` cancellation.
 - 📄 **DevSecOps & Multi-Format Reporting** — Exports to **OASIS SARIF v2.1.0** (GitHub Code Scanning & GitLab CI), Executive PDF, Technical HTML, JSON, and CSV.
 - 🔔 **Real-Time Alert Dispatcher** — Formatted alert notifications to Discord, Slack, Telegram, and generic HTTP webhooks.
-- 🧪 **100% Verified Test Suite** — 32 unit tests covering scope enforcement, XML parsing, AI heuristics, CVE version matching, OS fingerprinting, web auditing, and subdomain takeover (100% pass rate).
+- 🧪 **Cross-Platform Test Suite** — Automated tests cover scope enforcement, tool adapters, analyzers, app startup, and static assets.
 
 ---
 
@@ -270,36 +289,14 @@ Open `https://your-domain.com` in your browser to access the live dashboard!
 
 ---
 
-## 🧪 Verified Test Suite (21 Tests, 100% Pass)
+## 🧪 Automated Test Suite
 
-The platform includes a built-in automated test suite covering all critical security and adapter functions:
+The automated test suite covers scope enforcement, adapters, analyzers,
+cross-working-directory startup, and static frontend assets:
 
 ```bash
-# Run the complete test suite
-python3 -c "import sys; sys.path.insert(0, './backend'); sys.path.insert(0, '.'); \
-from tests.test_engine.test_scope_validator import *; \
-from tests.test_adapters.test_nmap_adapter import *; \
-from tests.test_analyzers.test_ai_advisor import *; \
-from tests.test_analyzers.test_cve_correlator import *; \
-from tests.test_adapters.test_nuclei_adapter import *; \
-from tests.test_analyzers.test_os_fingerprint import *; \
-test_loopback_is_blocked(); test_aws_imds_is_blocked(); test_approved_target_passes(); test_non_whitelisted_target_blocked(); \
-test_parses_open_ports_only(); test_parses_host_ip(); test_parses_service_info(); test_empty_output_no_crash(); \
-test_ai_advisor_port_exposure(); test_ai_advisor_clean_target(); \
-test_correlate_openssh_regresshion(); test_correlate_apache_path_traversal(); \
-test_nuclei_build_command(); test_nuclei_parse_output(); \
-test_ttl_linux_deduction(); test_ttl_windows_deduction(); test_ttl_cisco_network_deduction(); \
-test_ssh_banner_deduction(); test_http_iis_banner_deduction(); test_port_profile_windows(); test_composite_fingerprinting(); \
-print('ALL 21 TESTS PASSED WITH 100% SUCCESS!')"
+python tests/run_tests.py
 ```
-
-**Results:**
-- `4 Engine Tests`: Loopback blocking, AWS IMDS blocking, Whitelist verification.
-- `4 Nmap Tests`: Port parsing, Host address extraction, Service identification, Empty XML safety.
-- `2 AI Advisor Tests`: High-risk port penalties, MITRE ATT&CK mapping, Posture scoring.
-- `2 CVE Correlator Tests`: OpenSSH regreSSHion correlation, Apache path traversal matching.
-- `2 Nuclei Tests`: Safe argument construction, JSONL output normalization.
-- `7 OS Detection Tests`: TTL Linux/Windows/Cisco heuristics, SSH/HTTP banner matching, Port profile deduction, Composite fingerprinting.
 
 ---
 

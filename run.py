@@ -11,6 +11,7 @@ import urllib.request
 import socket
 import time
 import hashlib
+import shutil
 import venv
 
 
@@ -30,12 +31,27 @@ def ensure_project_environment():
         "Scripts" if os.name == "nt" else "bin",
         "python.exe" if os.name == "nt" else "python",
     )
-    if os.path.exists(venv_python) and os.path.samefile(sys.executable, venv_python):
+    venv_is_usable = False
+    if os.path.isfile(venv_python):
+        try:
+            result = subprocess.run(
+                [venv_python, "-c", "import sys; raise SystemExit(sys.version_info < (3, 10))"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+            venv_is_usable = result.returncode == 0
+        except OSError:
+            pass
+
+    if venv_is_usable and os.path.samefile(sys.executable, venv_python):
         return
 
-    if not os.path.exists(venv_python):
+    if not venv_is_usable:
         print("Creating the project virtual environment...")
         try:
+            if os.path.exists(VENV_DIR):
+                shutil.rmtree(VENV_DIR)
             os.makedirs(BACKEND_DIR, exist_ok=True)
             venv.EnvBuilder(with_pip=True).create(VENV_DIR)
         except (OSError, RuntimeError, subprocess.SubprocessError) as exc:
@@ -176,7 +192,15 @@ def setup_environment():
         if os.path.isfile(marker_file):
             with open(marker_file, "r", encoding="ascii") as marker:
                 installed_hash = marker.read().strip()
-        if installed_hash != requirements_hash:
+        dependencies_valid = (
+            subprocess.run(
+                [sys.executable, "-m", "pip", "check"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            ).returncode == 0
+        )
+        if installed_hash != requirements_hash or not dependencies_valid:
             print(f"{C_YELLOW}Installing project dependencies...{C_RESET}")
             subprocess.run(
                 [
