@@ -32,7 +32,7 @@ This document maintains a strict chronological track record of every step, decis
 - **Actions Completed:**
   - Initialized isolated Git repository in `c:\Users\ROG\OneDrive\Desktop\SCAN-PROJECT\scanet`.
   - Configured default branch: `main`.
-  - Linked remote GitHub origin: `https://github.com/mjishaan59-cell/scanet.git`.
+  - Linked remote GitHub origin: `https://github.com/kundudiya303-dk/scanet.git`.
   - Created `.gitignore` excluding temporary cache files, virtual environments, OS artifacts, and local databases.
   - Performed initial commit (`1578508`) and successfully pushed to GitHub repository.
 

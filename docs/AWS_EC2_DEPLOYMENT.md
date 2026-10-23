@@ -20,7 +20,7 @@ If you just want to run the single script on your EC2 instance and immediately v
 ### 2. On your EC2 Terminal: Run the One-Click Script
 ```bash
 # Clone the repository
-git clone https://github.com/mjishaan59-cell/scanet.git
+git clone https://github.com/kundudiya303-dk/scanet.git
 cd scanet
 
 # Run the universal launcher (auto-detects EC2 Public IP and binds to 0.0.0.0:8000)
@@ -109,7 +109,7 @@ sudo apt install -y python3 python3-pip python3-venv git curl ufw nginx nmap mtr
 
 ```bash
 # 1. Clone the scanet repository
-git clone https://github.com/mjishaan59-cell/scanet.git /opt/scanet-app
+git clone https://github.com/kundudiya303-dk/scanet.git /opt/scanet-app
 cd /opt/scanet-app
 
 # 2. Run the automated multi-architecture installer

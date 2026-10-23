@@ -65,7 +65,7 @@ def export_to_sarif(job_id: str, target: str, findings: List[Dict[str, Any]]) ->
                 "driver": {
                     "name": "scanet",
                     "version": "1.0.0",
-                    "informationUri": "https://github.com/mjishaan59-cell/scanet",
+                    "informationUri": "https://github.com/kundudiya303-dk/scanet",
                     "rules": rules
                 }
             },

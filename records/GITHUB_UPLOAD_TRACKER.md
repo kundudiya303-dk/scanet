@@ -1,7 +1,7 @@
 # scanet — GitHub Upload & Synchronization Log
 
 This document tracks all files, folders, commit hashes, and timestamps pushed to the remote repository:
-- **Repository URL:** [https://github.com/mjishaan59-cell/scanet.git](https://github.com/mjishaan59-cell/scanet.git)
+- **Repository URL:** [https://github.com/kundudiya303-dk/scanet.git](https://github.com/kundudiya303-dk/scanet.git)
 - **Primary Branch:** `main`
 
 ---

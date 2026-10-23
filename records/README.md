@@ -17,5 +17,5 @@ This directory serves as the centralized audit, tracking, and governance center 
 
 ## Governance Rules
 1. **Traceability:** No component or module is added without an entry in `PROJECT_STEPS_LOG.md`.
-2. **Synchronization:** Every file created or updated in this repository is committed and pushed to `https://github.com/mjishaan59-cell/scanet.git`.
+2. **Synchronization:** Every file created or updated in this repository is committed and pushed to `https://github.com/kundudiya303-dk/scanet.git`.
 3. **Reproducibility:** All decisions and trade-offs are documented with clear rationales in `ARCHITECTURE_DECISIONS.md`.

@@ -14,28 +14,27 @@ Unlike bulky enterprise suites (OpenVAS, Tenable Nessus, full OWASP ZAP) that co
 
 ---
 
-## ⚡ One-Command Instant Launch (Local or AWS EC2)
+## ⚡ One-Command Instant Launch (Local or Cloud)
 
 After cloning the repository, execute **one single command**:
 
-### On Linux / AWS EC2 (Direct HTTP Access):
+### On Linux (Direct HTTP Access):
 ```bash
-git clone https://github.com/mjishaan59-cell/scanet.git
+git clone https://github.com/kundudiya303-dk/scanet.git
 cd scanet
 ./run.sh
 ```
 Install Python 3.10 or newer first. On first launch, the script creates
 `backend/.venv` and installs the Python dependencies; native scanner binaries
 are optional. The first install requires internet access.
-> **🌐 AWS EC2 Quick Access (No HTTPS / No Domain Needed):**  
-> 1. In your **AWS EC2 Security Group**, add an Inbound Rule for **Custom TCP Port 8000** (Source: `0.0.0.0/0` or your IP).  
-> 2. Open `http://<YOUR_EC2_PUBLIC_IP>:8000` in your browser.  
-> 3. That's it! The colorful cybersecurity dashboard will load immediately.  
-> *(Optional: To run on a custom port like 8080 or 80, pass the port argument: `./run.sh 8080` or `sudo ./run.sh 80`)*
+> **🌐 Quick Web Access:**  
+> 1. Open `http://localhost:8000` in your browser.  
+> 2. That's it! The colorful cybersecurity dashboard will load immediately.  
+> *(Optional: To run on a custom port like 8080 or 80, pass the port argument: `./run.sh 8080` or `python run.py 8080`)*
 
 ### On Windows:
 ```cmd
-git clone https://github.com/mjishaan59-cell/scanet.git
+git clone https://github.com/kundudiya303-dk/scanet.git
 cd scanet
 run.bat
 ```
@@ -189,7 +188,7 @@ sudo apt install -y python3 python3-pip python3-venv git curl ufw nginx nmap mtr
 ### 5. Clone and Install scanet
 ```bash
 # Clone repository
-git clone https://github.com/mjishaan59-cell/scanet.git /opt/scanet-app
+git clone https://github.com/kundudiya303-dk/scanet.git /opt/scanet-app
 cd /opt/scanet-app
 
 # Run automated multi-architecture installer
@@ -329,5 +328,5 @@ scanet/
 ## 📜 License & Governance
 
 - **License:** MIT Open-Source License — see [`LICENSE`](LICENSE).
-- **GitHub Repository:** [https://github.com/mjishaan59-cell/scanet.git](https://github.com/mjishaan59-cell/scanet.git)
+- **GitHub Repository:** [https://github.com/kundudiya303-dk/scanet.git](https://github.com/kundudiya303-dk/scanet.git)
 - **Audit Records:** See [`records/PROJECT_STEPS_LOG.md`](records/PROJECT_STEPS_LOG.md) and [`records/GITHUB_UPLOAD_TRACKER.md`](records/GITHUB_UPLOAD_TRACKER.md).

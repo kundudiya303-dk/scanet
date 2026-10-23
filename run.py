@@ -115,18 +115,21 @@ def print_banner():
     print(f"  {C_BLUE}🔒 12 Recon Engines · OS Fingerprinting · AI MITRE ATT&CK · SARIF v2.1{C_RESET}")
     print(f"  {C_DARK}─────────────────────────────────────────────────────────────────────────────{C_RESET}")
 
-def get_public_ip():
+def get_local_ip():
     try:
-        with urllib.request.urlopen("https://checkip.amazonaws.com", timeout=2) as resp:
-            return resp.read().decode().strip()
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
     except Exception:
         try:
-            with urllib.request.urlopen("https://api.ipify.org", timeout=2) as resp:
-                return resp.read().decode().strip()
+            return socket.gethostbyname(socket.gethostname())
         except Exception:
-            return None
+            return "127.0.0.1"
 
-def print_host_audit(port, public_ip):
+
+def print_host_audit(port, local_ip):
     hostname = socket.gethostname()
     os_name = f"{platform.system()} {platform.release()}"
     arch = platform.machine()
@@ -135,10 +138,7 @@ def print_host_audit(port, public_ip):
     print(f"\n  {C_BOLD}{C_WHITE}╭─── 🖥️  HOST ENVIRONMENT AUDIT ──────────────────────────────────────────────╮{C_RESET}")
     print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Node Host:{C_RESET}       {C_WHITE}{hostname}{C_RESET} ({arch})")
     print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Operating Sys:{C_RESET}   {C_WHITE}{os_name}{C_RESET} │ Python {C_YELLOW}{py_ver}{C_RESET}")
-    if public_ip:
-        print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Public IPv4:{C_RESET}     {C_LIME}{public_ip}{C_RESET} {C_DIM}(Cloud / External Access Detected){C_RESET}")
-    else:
-        print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Public IPv4:{C_RESET}     {C_GRAY}Private / Local Subnet{C_RESET}")
+    print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Local IPv4:{C_RESET}      {C_LIME}{local_ip}{C_RESET}")
     print(f"  {C_WHITE}│{C_RESET}  {C_SKY}• Target Port:{C_RESET}     {C_CYAN}TCP {port}{C_RESET} {C_DIM}(HTTP Direct Access){C_RESET}")
     print(f"  {C_BOLD}{C_WHITE}╰─────────────────────────────────────────────────────────────────────────────╯{C_RESET}\n")
 
@@ -216,7 +216,7 @@ def setup_environment():
         print(f"\n{C_RED}Dependency installation failed: {exc}{C_RESET}")
         raise SystemExit(1) from exc
 
-def start_server(port=8000, public_ip=None):
+def start_server(port=8000, local_ip=None):
     sys.path.insert(0, BACKEND_DIR)
 
     print(f"  {C_PURPLE}[4/4]{C_RESET}  {C_BOLD}{C_WHITE}SERVER ORCHESTRATION{C_RESET}        ... {C_GREEN}✓ ASGI Interface Ready{C_RESET}")
@@ -226,15 +226,13 @@ def start_server(port=8000, public_ip=None):
     print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}                     {C_BOLD}{C_YELLOW}⚡  SCANET PLATFORM IS NOW ONLINE  ⚡{C_RESET}                      {C_BOLD}{C_CYAN}║{C_RESET}")
     print(f"{C_BOLD}{C_CYAN}  ╠══════════════════════════════════════════════════════════════════════════════╣{C_RESET}")
     print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}                                                                              {C_BOLD}{C_CYAN}║{C_RESET}")
-    if public_ip:
-        print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_LIME}🌐  CLOUD PUBLIC ACCESS:{C_RESET}     {C_BOLD}{C_YELLOW}http://{public_ip}:{port}{C_RESET}  {C_DIM}◄ [OPEN IN BROWSER]{C_RESET}   {C_BOLD}{C_CYAN}║{C_RESET}")
-    print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_SKY}🏠  LOCAL ACCESS LINK:{C_RESET}       {C_WHITE}http://localhost:{port}{C_RESET}                              {C_BOLD}{C_CYAN}║{C_RESET}")
-    host_target = public_ip if public_ip else "localhost"
-    print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_PURPLE}📚  INTERACTIVE SWAGGER:{C_RESET}     {C_WHITE}http://{host_target}:{port}/docs{C_RESET}                         {C_BOLD}{C_CYAN}║{C_RESET}")
-    print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_GREEN}🩺  SYSTEM HEALTH PROBE:{C_RESET}     {C_WHITE}http://{host_target}:{port}/api/v1/system/health{C_RESET}        {C_BOLD}{C_CYAN}║{C_RESET}")
+    print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_SKY}🏠  LOCAL ACCESS LINK:{C_RESET}       {C_WHITE}http://localhost:{port}{C_RESET}  {C_DIM}◄ [OPEN IN BROWSER]{C_RESET}         {C_BOLD}{C_CYAN}║{C_RESET}")
+    if local_ip and local_ip != "127.0.0.1":
+        print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_LIME}🌐  NETWORK ACCESS LINK:{C_RESET}     {C_WHITE}http://{local_ip}:{port}{C_RESET}                              {C_BOLD}{C_CYAN}║{C_RESET}")
+    print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_PURPLE}📚  INTERACTIVE SWAGGER:{C_RESET}     {C_WHITE}http://localhost:{port}/docs{C_RESET}                         {C_BOLD}{C_CYAN}║{C_RESET}")
+    print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_BOLD}{C_GREEN}🩺  SYSTEM HEALTH PROBE:{C_RESET}     {C_WHITE}http://localhost:{port}/api/v1/system/health{C_RESET}        {C_BOLD}{C_CYAN}║{C_RESET}")
     print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}                                                                              {C_BOLD}{C_CYAN}║{C_RESET}")
     print(f"{C_BOLD}{C_CYAN}  ╠══════════════════════════════════════════════════════════════════════════════╣{C_RESET}")
-    print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_ORANGE}⚠️  FIREWALL NOTE:{C_RESET} Ensure Port {port} (Custom TCP) is OPEN in Cloud Security Group! {C_BOLD}{C_CYAN}║{C_RESET}")
     print(f"{C_BOLD}{C_CYAN}  ║{C_RESET}   {C_GRAY}⌨️  KEYBOARD:{C_RESET}      Press {C_WHITE}[CTRL + C]{C_RESET} anytime to shut down the server.           {C_BOLD}{C_CYAN}║{C_RESET}")
     print(f"{C_BOLD}{C_CYAN}  ╚══════════════════════════════════════════════════════════════════════════════╝{C_RESET}\n")
 
@@ -258,9 +256,9 @@ if __name__ == "__main__":
         port = int(os.environ["PORT"])
 
     print_banner()
-    public_ip = get_public_ip()
-    print_host_audit(port, public_ip)
+    local_ip = get_local_ip()
+    print_host_audit(port, local_ip)
     port = prompt_interactive(port)
     check_python()
     setup_environment()
-    start_server(port, public_ip)
+    start_server(port, local_ip)
